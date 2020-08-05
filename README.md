@@ -1,2 +1,2 @@
-# hak-kernel
-Experimental separation kernel.
+# KongligSK
+Experimental separation kernel for RISC-V.
