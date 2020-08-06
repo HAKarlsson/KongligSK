@@ -4,28 +4,54 @@
 
 #ifndef __ASSEMBLER__
 /*** CSR functions for C ***/
-/* Read from CSR register. */
-inline unsigned long read_csr(int csr_num) __attribute__ ((always_inline));
-/* Write to CSR register. */
-inline void write_csr(int csr_num, unsigned long value) __attribute__ ((always_inline));
-/* Read and then write to CSR register (atomically). */
-inline unsigned long swap_csr(int csr_num, unsigned long value) __attribute__ ((always_inline));
+/* Base instructions */
+inline unsigned long csrrw(int csr_num, unsigned long rs) __attribute__ ((always_inline));
+inline unsigned long csrrs(int csr_num, unsigned long rs) __attribute__ ((always_inline));
+inline unsigned long csrrc(int csr_num, unsigned long rs) __attribute__ ((always_inline));
 
-inline unsigned long read_csr(int csr_num) {
-    int result;
-    __asm__("csrr %0, %1" : "=r"(result) : "I"(csr_num));
-    return result;
+/* Pseudoinstructions */
+inline unsigned long csrr(int csr_num) __attribute__ ((always_inline));
+inline void csrw(int csr_num, unsigned long rs) __attribute__ ((always_inline));
+inline void csrs(int csr_num, unsigned long rs) __attribute__ ((always_inline));
+inline void csrc(int csr_num, unsigned long rs) __attribute__ ((always_inline));
+
+/* Definitions */
+inline unsigned long csrrw(int csr_num, unsigned long rs) {
+    int rd;
+    __asm__("csrrw %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs));
+    return rd;
 }
 
-inline void write_csr(int csr_num, unsigned long value) {
-    __asm__("csrw %0, %1" :: "I"(csr_num), "r"(value));
+inline unsigned long csrrs(int csr_num, unsigned long rs) {
+    int rd;
+    __asm__("csrrs %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs));
+    return rd;
 }
 
-inline unsigned long swap_csr(int csr_num, unsigned long value) {
-    int result;
-    __asm__("csrrw %0, %1, %2" : "=r"(result) : "I"(csr_num), "r"(value));
-    return result;
+inline unsigned long csrrc(int csr_num, unsigned long rs) {
+    int rd;
+    __asm__("csrrc %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs));
+    return rd;
 }
+
+inline unsigned long csrr(int csr_num) {
+    int rd;
+    __asm__("csrrs %0, %1, x0" : "=r"(rd) : "I"(csr_num));
+    return rd;
+}
+
+inline void csrw(int csr_num, unsigned long rs) {
+    __asm__("csrrw x0, %0, %1" :: "I"(csr_num), "r"(rs));
+}
+
+inline void csrs(int csr_num, unsigned long rs) {
+    __asm__("csrrs x0, %0, %1" :: "I"(csr_num), "r"(rs));
+}
+
+inline void csrc(int csr_num, unsigned long rs) {
+    __asm__("csrrc x0, %0, %1" :: "I"(csr_num), "r"(rs));
+}
+
 #endif /* __ASSEMBLER__ */
 
 /*** Machine CSR Numbers **/
