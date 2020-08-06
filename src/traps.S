@@ -3,6 +3,8 @@
 
 .global trap_exit 
 .global trap_entry
+.extern handle_excpt
+.extern handle_intrp
 
 .section .text.traps
 /* trap_entry(void) */

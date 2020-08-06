@@ -20,5 +20,5 @@ _start:
 
 /* initialize the kernel */
     /* init_kernel(void) */
-    jal     init_kernel
+    tail     init_kernel
 
