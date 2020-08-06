@@ -7,8 +7,8 @@
 
 _start:
     /* disable interrupts */
-    csrw    CSR_MIE, zero
-    csrw    CSR_MIP, zero
+    csrrw   zero, CSR_MIE, zero
+    csrrw   zero, CSR_MIP, zero 
     fence.i
 
     /* load gp and sp */
@@ -19,14 +19,6 @@ _start:
     la      sp, _sp
 
 /* initialize the kernel */
+    /* init_kernel(void) */
     jal     init_kernel
 
-/* setup trap handler */
-    la      t0, trap_entry
-    /* mtvec mode must be 0. If not zero, hang. */
-    andi    t1, t0, 0x3
-1:  bnez    t1, 1b
-    csrw    mtvec, t0
-
-/* load user context */
-    j       restore_user_context
