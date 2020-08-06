@@ -7,10 +7,19 @@
 .extern handle_intrp
 
 .section .text.traps
+/* Trap vector MUST be 4 byte aligned for _DIRECT_ MTVEC mode.*/
+.align 4 
 /* trap_entry(void) */
 trap_entry:
     /* Swap a0 with PCB pointer in MSCRATCH. */
     csrrw   a0, CSR_MSCRATCH, a0
+
+/* 
+ * Here we can add checks for exceptions or interrupts in the kernel, 
+ * but we assume the kernel is error free and non preemptible. This
+ * removes expensive branching.
+ */
+
     /* Save user context. */
     /* Save general purpose registers. */
     SREG    ra, PCB_RA(a0)  
