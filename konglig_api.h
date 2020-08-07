@@ -3,23 +3,32 @@
 #define __ALWAYS_INLINE__ __attribute__ ((always_inline))
 
 /*** Base system calls ***/
-/* Yield to `zone`. */
-inline void ksk_YieldTo(int zone) __ALWAYS_INLINE__;
-/* Atomically read and write to csr. */
-inline unsigned long ksk_CSRRW(int csr_num, long value) __ALWAYS_INLINE__;
-/* Atomically read and set to csr. */
-inline unsigned long ksk_CSRRS(int csr_num, long value) __ALWAYS_INLINE__;
-/* Atomically read and clear to csr. */
-inline unsigned long ksk_CSRRC(int csr_num, long value) __ALWAYS_INLINE__;
+/** 
+ * Send a 16 byte message from process. 
+ * Returns the receivers process_id on success. 
+ * Returns -1 if receiver's message box is full. 
+ */
+inline int ksk_Send(int process_id, char message[16]) __ALWAYS_INLINE__;
+
+/** 
+ * Receive a 16 byte message from process. 
+ * If process_id is -1, then receive a message from any process.
+ * Returns the senders process_id on success. 
+ * Returns -1 if the message box is empty. 
+ */
+inline int ksk_Recv(int process_id, char message[16]) __ALWAYS_INLINE__;
+
+/**
+ * Yield the remaining time slice to process. 
+ */
+inline void ksk_YieldTo(int process_id) __ALWAYS_INLINE__;
 
 /*** Pseudo system calls ***/
-/* Read csr. */
-inline unsigned long ksk_CSRR(int csr_num) __ALWAYS_INLINE__;
-/* Write csr. */
-inline void ksk_CSRW(int csr_num, long value) __ALWAYS_INLINE__;
-/* Set csr. */
-inline void ksk_CSRS(int csr_num, long value) __ALWAYS_INLINE__;
-/* Clear csr. */
-inline void ksk_CSRC(int csr_num, long value) __ALWAYS_INLINE__;
+/**
+ * Receive a 16 byte message from any process
+ * Returns the sender's process_id on success.
+ * Return -1 if all message boxes are empty.
+ */
+inline int ksk_RecvAny(char message[16]) __ALWAYS_INLINE__;
 
 #endif /* _KONGLIG_API_H */
