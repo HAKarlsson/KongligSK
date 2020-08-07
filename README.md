@@ -1,5 +1,7 @@
 # KongligSK
-Separation kernel for RISC-V targeting secure embedded processors (M+U-mode and PMP). This is a playground for features, designs, and build system that may be included in [OpenMZ](https://github.com/castor-software/openmz). *Projected completion date 2025.*
+Separation kernel for RISC-V targeting secure embedded processors (M+U-mode and PMP). This is a playground for features, designs, and build system that may be included in [OpenMZ](https://github.com/castor-software/openmz). 
+
+*Projected completion date 2025.*
 
 ## Kernel goals
 - Formal verification - A separation kernel should be completely verified.
