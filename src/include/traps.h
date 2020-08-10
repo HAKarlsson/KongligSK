@@ -6,7 +6,7 @@
 
 extern void trap_entry(void) NO_RETURN;
 extern void trap_exit(pcb_t *pcb) NO_RETURN;
-void handle_excpt(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) NO_RETURN; 
-void handle_intrp(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) NO_RETURN;
+pcb_t* handle_excpt(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval); 
+pcb_t* handle_intrp(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval);
 
 #endif /* _TRAPS_H */
