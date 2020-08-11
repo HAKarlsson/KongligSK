@@ -1,4 +1,5 @@
 # This file is part of KongligSK.
+# Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
 # 
 # KongligSK is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
