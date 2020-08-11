@@ -22,6 +22,8 @@
 .global trap_entry
 .extern handle_excpt
 .extern handle_intrp
+.extern __global_pointer$
+.extern _sp
 
 .section .text.traps
 /* Trap vector MUST be 4 byte aligned for _DIRECT_ MTVEC mode.*/
@@ -74,6 +76,13 @@ trap_entry:
     /* Save program counter. */
     csrr    t1, CSR_MEPC
     SREG    t1, GR_PC(a0)
+
+    /* Load kernel gp and sp. */
+.option push
+.option norelax
+    la      gp, __global_pointer$
+.option pop
+    la      sp, _sp
 
     /* Call interrupt or exception handler. */
     csrr    a1, CSR_MCAUSE

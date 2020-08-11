@@ -28,7 +28,7 @@ CFLAGS += -Og -g
 # but maybe not other compilers.
 SFLAGS += -D__ASSEMBLER__
 SFLAGS += -Iinclude
-SFLAGS +=  -Wall
+SFLAGS += -Wall
 # Do optimizations do anything to assembly code???
 SFLAGS += -Og -g
 

@@ -18,6 +18,9 @@ export BUILD_DIR ?= $(CURDIR)/build-konglig
 export CC = riscv64-unknown-elf-gcc
 export SIZE = riscv64-unknown-elf-size
 
+.PHONY: all
+all: konglig
+
 .PHONY: konglig
 konglig:
 	$(MAKE) -C konglig all 

@@ -15,4 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include "csr.h"
+#include "traps.h"
+#include "pcb.h"
 
+/* Temporary data for testing */
+pcb_t pcb = { 
+    .gr =       {[GR_PC] = 0x200000},
+    .pmpcfg =   {[0] = 0x17},
+    .pmpaddr =  {[0] = -1},
+};
+
+void cpu_init(void) {
+    /* Set CPU frequency and so on. */
+}
+
+void kernel_init(void) {
+    csrw(CSR_MSTATUS, 0); 
+    csrw(CSR_PMPCFG0, pcb.pmpcfg[0]);
+    csrw(CSR_PMPADDR0, pcb.pmpaddr[0]);
+    /* We should write to MTVEC last. This causes initialization 
+     * exception to be caught in head.S. */
+    csrw(CSR_MTVEC, (uintptr_t)trap_entry);
+    trap_exit(&pcb);
+}

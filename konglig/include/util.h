@@ -24,14 +24,23 @@
 #define COLD __attribute__ ((cold))
 
 
+/* Use a on RV32, b on RV64 */
 #if __riscv_xlen == 32
 #define SEL(a, b) a
 #else
 #define SEL(a, b) b
 #endif
 
-#define SREG    SEL(sw, sd)
-#define LREG    SEL(lw, ld)
-#define REG_SIZE SEL(4, 8)
+#define SREG        SEL(sw, sd)
+#define LREG        SEL(lw, ld)
+#define REG_BYTES   SEL(4, 8)
+#define REG_BITS    SEL(32, 64)
+
+#define ONES        SEL(0xFFFFFFFFUL, 0xFFFFFFFFFFFFFFFFUL) 
+
+/* Set bit n. */
+#define BIT(n)      (1 << n)
+/* Set bits n, n+1, ..., m-1. */
+#define BITS(n,m)   (0)
 
 #endif /* _UTIL_H */

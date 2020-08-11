@@ -17,7 +17,7 @@
  */
 #ifndef _CSR_H
 #define _CSR_H
-/* CSR numbers, offsets, and functions. */
+#include "util.h"
 
 #ifndef __ASSEMBLER__
 /*** CSR functions for C ***/
@@ -269,5 +269,7 @@ inline void csrc(int csr_num, unsigned long rs) {
 #define CSR_MHPMEVENT29     0x33d
 #define CSR_MHPMEVENT30     0x33e
 #define CSR_MHPMEVENT31     0x33f
+
+/* CSR offsets */
 
 #endif /* _CSR_H */

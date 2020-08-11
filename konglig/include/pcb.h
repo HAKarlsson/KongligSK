@@ -68,6 +68,9 @@ typedef struct pcb {
     uintptr_t gr[32];
     /* Trap setup and handling registers */
     uintptr_t tr[8];
+    /* PMP config */
+    uintptr_t pmpcfg[2];
+    uintptr_t pmpaddr[8];
 } pcb_t;
 
 #endif /* _PCB_H */

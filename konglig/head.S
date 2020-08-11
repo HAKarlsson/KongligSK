@@ -35,7 +35,37 @@ _start:
 .option pop
     la      sp, _sp
 
-/* initialize the kernel */
-    /* init_kernel(void) */
-    tail     init_kernel
+    /* Set trap vector to hang. */
+    /* If we get an error in the initilization, we jump to hang. */
+    la      t0, hang
+    csrw    CSR_MTVAL, t0
 
+    /* Copy data section. */
+    la      t0, _data_lma       /* Start of load data memory address. */
+    la      t1, _data           /* Start of data section. */
+    la      t2, _edata          /* End of data section. */
+    beq     t0, t1, 2f          /* If _data == _data_lma, no copy. */
+1:  beq     t1, t2, 2f          /* _data == _edata, copy finished. */
+    lw      a0, 0(t0)
+    sw      a0, 0(t1)
+    addi    t0, t0, 4
+    addi    t1, t1, 4
+    j       1b 
+2:
+
+    /* Zero the bss section */
+    la      t1, _bss        /* Start of bss section. */
+    la      t2, _ebss       /* End of bss section. */
+1:  beq     t1, t1, 2f      /* If _bss == _ebss, zeroing finished. */
+    sw      zero, 0(t1)
+    addi    t1, t1, 4
+    j       1b
+2:
+
+/* initialize the kernel */
+    /* kernel_init(void) */
+    call     kernel_init
+
+hang:
+    ebreak
+    j       hang
