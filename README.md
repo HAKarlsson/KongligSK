@@ -1,5 +1,5 @@
 # KongligSK
-Separation kernel for RISC-V targeting secure embedded processors (M+U-mode and PMP). This is a playground for features, designs, and build system that may be included in [OpenMZ](https://github.com/castor-software/openmz). 
+KongligSK (~Royal Separation Kernel) is a separation kernel for RISC-V targeting secure embedded processors (M+U-mode and PMP). KongligSK is a research kernel for features, designs, and build system that may be included in [OpenMZ](https://github.com/castor-software/openmz). 
 
 *Projected completion date 2025.*
 
@@ -28,10 +28,10 @@ RISC-V has a lot of extensions (official and custom), so the kernel should be co
 RT properties makes the kernel suitable for some RT applications.
 
 ## API
-WIP.
+TBD.
 
 ## Installation
-WIP.
+TBD.
 
 ## Related Projects 
 - [seL4](https://sel4.systems/) - A verified and secure µ-kernel.
