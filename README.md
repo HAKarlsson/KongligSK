@@ -4,7 +4,9 @@ Separation kernel for RISC-V targeting secure embedded processors (M+U-mode and 
 *Projected completion date 2025.*
 
 ## Kernel goals
-- Formal verification - A separation kernel should be completely verified.
+- Formal verification - A separation kernel should be completely verified. We will verify it in two stages.
+    - We formally verify the C code with respect to a formal model of the kernel and the RISC-V specification. This allows us to compile the kernel with formally verified compiler [CompCert](https://github.com/AbsInt/CompCert), and get a fully formally verified kernel.
+    - We formally verify the kernel binary using [HolBA](https://github.com/kth-step/HolBA), allowing us to use any compiler and thus get better optimization.
 - Security - A separation kernel secures processes with spatial and temporal isolation.
 - Performance - Fast context switches and IPC calls are essential for a separation kernel.
 - Size - A small footprint is essential for both performance and embedded systems.
@@ -14,12 +16,12 @@ Separation kernel for RISC-V targeting secure embedded processors (M+U-mode and 
 ## API
 WIP.
 
-## Authors
-- [Henrik Karlsson](https://github.com/HAKarlsson)
-
 ## Inspiration
 - [seL4](https://sel4.systems/)
 - [CertiKOS](http://flint.cs.yale.edu/certikos/)
+
+## Authors
+- [Henrik Karlsson](https://github.com/HAKarlsson)
 
 ## Copyright
 Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
