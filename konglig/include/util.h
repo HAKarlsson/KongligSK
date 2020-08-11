@@ -39,7 +39,7 @@
 #define ONES        SEL(0xFFFFFFFFUL, 0xFFFFFFFFFFFFFFFFUL) 
 
 /* Set bit n. */
-#define BIT(n)      (1 << n)
+#define BIT(n)      (1 << (n))
 /* Set bits n, n+1, ..., m-1. */
 #define BITS(n,m)   (0)
 

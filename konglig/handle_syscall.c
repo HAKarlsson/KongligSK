@@ -21,6 +21,7 @@
 typedef pcb_t* (*handler_t)(pcb_t *pcb);
 
 
-pcb_t* handle_syscall(pcb_t *pcb) {
+pcb_t* handle_syscall(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) {
+    pcb->gr[GR_PC] += 4;
     return pcb;
 }

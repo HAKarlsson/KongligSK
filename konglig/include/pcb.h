@@ -19,7 +19,7 @@
 #define _PCB_H
 #include "types.h"
 
-/* General registers offset */
+/* General registers index. */
 #define GR_PC       0
 #define GR_RA       1
 #define GR_SP       2
@@ -53,7 +53,7 @@
 #define GR_T5       30
 #define GR_T6       31
 
-/* Trap registers offset */
+/* Trap registers index. */
 #define TR_USTATUS  0
 #define TR_UIE      1
 #define TR_UTVEC    2
@@ -62,6 +62,8 @@
 #define TR_UCAUSE   5
 #define TR_UTVAL    6
 #define TR_UIP      7
+
+
 
 typedef struct pcb {
     /* General registers */

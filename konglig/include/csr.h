@@ -21,51 +21,47 @@
 
 #ifndef __ASSEMBLER__
 /*** CSR functions for C ***/
+
+/*
+ * The const and inline modifiers is for both optimization and correctness.
+ * Do not remove them!
+ */
+
 /* Base instructions */
-inline unsigned long csrrw(int csr_num, unsigned long rs) __attribute__ ((always_inline));
-inline unsigned long csrrs(int csr_num, unsigned long rs) __attribute__ ((always_inline));
-inline unsigned long csrrc(int csr_num, unsigned long rs) __attribute__ ((always_inline));
-
-/* Pseudoinstructions */
-inline unsigned long csrr(int csr_num) __attribute__ ((always_inline));
-inline void csrw(int csr_num, unsigned long rs) __attribute__ ((always_inline));
-inline void csrs(int csr_num, unsigned long rs) __attribute__ ((always_inline));
-inline void csrc(int csr_num, unsigned long rs) __attribute__ ((always_inline));
-
-/* Definitions */
-inline unsigned long csrrw(int csr_num, unsigned long rs) {
+static inline ALWAYS_INLINE unsigned long csrrw(const int csr_num, const unsigned long rs) {
     int rd;
     __asm__("csrrw %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs));
     return rd;
 }
 
-inline unsigned long csrrs(int csr_num, unsigned long rs) {
+static inline ALWAYS_INLINE unsigned long csrrs(const int csr_num, const unsigned long rs) {
     int rd;
     __asm__("csrrs %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs));
     return rd;
 }
 
-inline unsigned long csrrc(int csr_num, unsigned long rs) {
+static inline ALWAYS_INLINE unsigned long csrrc(const int csr_num, const unsigned long rs) {
     int rd;
     __asm__("csrrc %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs));
     return rd;
 }
 
-inline unsigned long csrr(int csr_num) {
+static inline ALWAYS_INLINE unsigned long csrr(const int csr_num) {
     int rd;
     __asm__("csrrs %0, %1, x0" : "=r"(rd) : "I"(csr_num));
     return rd;
 }
 
-inline void csrw(int csr_num, unsigned long rs) {
+/* Pseudoinstructions */
+static inline ALWAYS_INLINE void csrw(const int csr_num, const unsigned long rs) {
     __asm__("csrrw x0, %0, %1" :: "I"(csr_num), "r"(rs));
 }
 
-inline void csrs(int csr_num, unsigned long rs) {
+static inline ALWAYS_INLINE void csrs(const int csr_num, const unsigned long rs) {
     __asm__("csrrs x0, %0, %1" :: "I"(csr_num), "r"(rs));
 }
 
-inline void csrc(int csr_num, unsigned long rs) {
+static inline ALWAYS_INLINE void csrc(const int csr_num, const unsigned long rs) {
     __asm__("csrrc x0, %0, %1" :: "I"(csr_num), "r"(rs));
 }
 
@@ -271,5 +267,35 @@ inline void csrc(int csr_num, unsigned long rs) {
 #define CSR_MHPMEVENT31     0x33f
 
 /* CSR offsets */
+#define MCAUSE_INTERRUPT_BIT    BIT(REG_BYTES - 1)
+
+#define MCAUSE_INSTRUCTION_ADDRESS_MISALIGNED   0
+#define MCAUSE_INSTRUCTION_ACCESS_FAULT         1
+#define MCAUSE_ILLEGAL_INSTRUCTION              2
+#define MCAUSE_BREAKPOINT                       3
+#define MCAUSE_LOAD_ADDRESS_MISALIGNED          4
+#define MCAUSE_LOAD_ACCESS_FAULT                5
+#define MCAUSE_STORE_ADDRESS_MISALIGNED         6
+#define MCAUSE_STORE_ACCESS_FAULT               7
+#define MCAUSE_UMODE_ECALL                      8
+#define MCAUSE_SMODE_ECALL                      9
+#define MCAUSE_MMODE_ECALL                      11
+#define MCAUSE_INSTRUCTION_PAGE_FAULT           12
+#define MCAUSE_LOAD_PAGE_FAULT                  13
+#define MCAUSE_STORE_PAGE_FAULT                 15
+
+/* User CSR registers */
+#define CSR_USTATUS     0x000
+#define CSR_UIE         0x004
+#define CSR_UTVEC       0x005
+#define CSR_USCRATCH    0x040
+#define CSR_UEPC        0x041
+#define CSR_UCAUSE      0x042
+#define CSR_UTVAL       0x043
+#define CSR_UIP         0x044
+
+/* User CSR fields. */
+#define USTATUS_UIE     0x1
+#define USTATUS_UPIE    0x10
 
 #endif /* _CSR_H */
