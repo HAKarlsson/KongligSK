@@ -56,4 +56,4 @@ tags
 .ycm_extra_conf.py
 
 # objdump files
-*.o.da
+*.da
