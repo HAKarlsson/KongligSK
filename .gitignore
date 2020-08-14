@@ -55,5 +55,5 @@ dkms.conf
 tags
 .ycm_extra_conf.py
 
-# kernel config
-include/config.h
+# objdump files
+*.o.da

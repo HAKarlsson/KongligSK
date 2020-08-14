@@ -16,11 +16,13 @@
 
 # Tools
 CC = riscv64-unknown-elf-gcc
+OBJDUMP = riscv64-unknown-elf-objdump
+SIZE = riscv64-unknown-elf-size
 
-SRCDIR   = src
-BUILDDIR = konglig_build
+BUILDDIR ?= konglig_build
 
-ELF = $(BUILDDIR)/konglig.elf
+SRCDIR    = src
+ELF       = $(BUILDDIR)/konglig.elf
 C_SOURCE  = $(wildcard $(SRCDIR)/*.c)
 S_SOURCE  = $(wildcard $(SRCDIR)/*.S)
 C_OBJECTS = $(patsubst $(SRCDIR)/%.c, $(BUILDDIR)/%.o, $(C_SOURCE))
@@ -44,6 +46,7 @@ S_FLAGS += -Og -g
 
 ### Linker flags ###
 LD_FLAGS += -nostdlib
+LD_FLAGS += $(LINKER_SCRIPT)
 
 
 
@@ -53,16 +56,25 @@ all: $(BUILDDIR) $(ELF)
 
 .PHONY: clean
 clean: 
-	@rm -fr $(BUILDDIR) $(ELF)
+	@rm -fr $(BUILDDIR)
+
+tags: $(wildcard src/*) $(wildcard include/*)
+	@echo Generating tags for src/ and include/...
+	@ctags -R src/ include/
+	@echo Done.
 
 $(BUILDDIR): 
 	@mkdir -p $@
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) $(C_FLAGS) -c $< -o $@
+	$(OBJDUMP) -d -S $@ > $@.da
+
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.S
 	$(CC) $(S_FLAGS) -c $< -o $@
+	$(OBJDUMP) -d $@ > $@.da
 
 $(ELF): $(S_OBJECTS) $(C_OBJECTS)
 	$(CC) $(LD_FLAGS) $(S_OBJECTS) $(C_OBJECTS) -o $@
+	$(SIZE) $(S_OBJECTS) $(C_OBJECTS) $(ELF)
