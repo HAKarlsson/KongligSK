@@ -20,7 +20,7 @@
 
 #define NO_RETURN __attribute__((noreturn))
 #define ALWAYS_INLINE __attribute__((always_inline))
-#define HOT __attribute__((cold))
+#define HOT __attribute__((hot))
 #define COLD __attribute__((cold))
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
@@ -41,7 +41,7 @@
 
 /* Set bit n. */
 #define BIT(n) (1 << (n))
-/* Set bits n, n+1, ..., m-1. */
+/* TODO: Set bits n, n+1, ..., m-1. */
 #define BITS(n, m) (0)
 
 #endif /* _UTIL_H */

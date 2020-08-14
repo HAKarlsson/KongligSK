@@ -21,48 +21,42 @@
 
 #ifndef __ASSEMBLER__
 /*** CSR functions for C ***/
-
-/*
- * The const and inline modifiers is for both optimization and correctness.
- * Do not remove them!
- */
-
 /* Base instructions */
 #define CSRRW(rd, csr_num, rs)                                                 \
-  __asm__("csrrw %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs));
+  __asm__("csrrw %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
 
 #define CSRRS(rd, csr_num, rs)                                                 \
-  __asm__("csrrs %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs));
+  __asm__("csrrs %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
 
 #define CSRRC(rd, csr_num, rs)                                                 \
-  __asm__("csrrc %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs));
+  __asm__("csrrc %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
 
 #define CSRRWI(rd, csr_num, imm)                                               \
-  __asm__("csrrwi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm));
+  __asm__("csrrwi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
 
 #define CSRRSI(rd, csr_num, imm)                                               \
-  __asm__("csrrsi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm));
+  __asm__("csrrsi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
 
 #define CSRRCI(rd, csr_num, imm)                                               \
-  __asm__("csrrci %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm));
+  __asm__("csrrci %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
 
 /* Pseudo CSR instructions */
-#define CSRR(rd, csr_num) __asm__("csrrs %0, %1, x0" : "=r"(rd) : "I"(csr_num));
+#define CSRR(rd, csr_num) __asm__("csrrs %0, %1, x0" : "=r"(rd) : "I"(csr_num))
 
-#define CSRW(csr_num, rs) __asm__("csrrw x0, %0, %1" ::"I"(csr_num), "r"(rs));
+#define CSRW(csr_num, rs) __asm__("csrrw x0, %0, %1" ::"I"(csr_num), "r"(rs))
 
-#define CSRS(csr_num, rs) __asm__("csrrs x0, %0, %1" ::"I"(csr_num), "r"(rs));
+#define CSRS(csr_num, rs) __asm__("csrrs x0, %0, %1" ::"I"(csr_num), "r"(rs))
 
-#define CSRC(csr_num, rs) __asm__("csrrs x0, %0, %1" ::"I"(csr_num), "r"(rs));
+#define CSRC(csr_num, rs) __asm__("csrrs x0, %0, %1" ::"I"(csr_num), "r"(rs))
 
 #define CSRWI(csr_num, imm)                                                    \
-  __asm__("csrrwi x0, %0, %1" ::"I"(csr_num), "I"(imm));
+  __asm__("csrrwi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
 #define CSRSI(csr_num, imm)                                                    \
-  __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm));
+  __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
 #define CSRCI(csr_num, imm)                                                    \
-  __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm));
+  __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
 #endif /* __ASSEMBLER__ */
 
