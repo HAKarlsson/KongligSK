@@ -17,7 +17,7 @@
  */
 
 #include "syscall.h"
-#include "user_excpt.h"
+#include "user_trap.h"
 #include "csr.h"
 #include "inst_code.h"
 #include "util.h"

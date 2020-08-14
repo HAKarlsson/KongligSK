@@ -1,4 +1,4 @@
-#include "user_excpt.h"
+#include "user_trap.h"
 pcb_t* handle_user_excpt(pcb_t* pcb, uintptr_t mcause, uintptr_t mtval) {
     /* Save user pc. */
     pcb->tr[TR_UEPC] = pcb->gr[GR_PC];

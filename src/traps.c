@@ -19,7 +19,7 @@
 #include "syscall.h"
 #include "util.h"
 #include "csr.h"
-#include "user_excpt.h"
+#include "user_trap.h"
 
 typedef pcb_t* (*handler_t)(pcb_t*, uintptr_t, uintptr_t);
 
