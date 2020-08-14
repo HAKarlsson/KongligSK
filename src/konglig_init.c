@@ -17,14 +17,7 @@
  */
 #include "csr.h"
 #include "traps.h"
-#include "pcb.h"
-
-/* Temporary data for testing */
-pcb_t pcb = { 
-    .gr =       {[GR_PC] = 0x200000},
-    .pmpcfg =   {[0] = 0x17},
-    .pmpaddr =  {[0] = -1},
-};
+#include "kernel.h"
 
 void cpu_init(void) {
     /* Set CPU frequency and so on. */
@@ -32,6 +25,7 @@ void cpu_init(void) {
 
 void kernel_init(void) {
     csrw(CSR_MSTATUS, 0); 
+    pcb_t pcb = kernel.processes[0];
     csrw(CSR_PMPCFG0, pcb.pmpcfg[0]);
     csrw(CSR_PMPADDR0, pcb.pmpaddr[0]);
     /* We should write to MTVEC last. This causes initialization 

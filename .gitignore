@@ -54,3 +54,6 @@ dkms.conf
 # ctags
 tags
 .ycm_extra_conf.py
+
+# kernel config
+include/config.h

@@ -14,17 +14,55 @@
 # You should have received a copy of the GNU General Public License
 # along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
 
-export BUILD_DIR ?= $(CURDIR)/build-konglig
-export CC = riscv64-unknown-elf-gcc
-export SIZE = riscv64-unknown-elf-size
+# Tools
+CC = riscv64-unknown-elf-gcc
 
+SRCDIR   = src
+BUILDDIR = konglig_build
+
+ELF = $(BUILDDIR)/konglig.elf
+C_SOURCE  = $(wildcard $(SRCDIR)/*.c)
+S_SOURCE  = $(wildcard $(SRCDIR)/*.S)
+C_OBJECTS = $(patsubst $(SRCDIR)/%.c, $(BUILDDIR)/%.o, $(C_SOURCE))
+S_OBJECTS = $(patsubst $(SRCDIR)/%.S, $(BUILDDIR)/%.o, $(S_SOURCE))
+	    
+
+### C flags ###
+C_FLAGS += -std=c99 
+C_FLAGS += -Iinclude
+C_FLAGS += -Wall 
+C_FLAGS += -Og -g 
+
+### Assembly flags ###
+# __ASSEMBLER__ is already defined for GCC, 
+# but maybe not other compilers.
+S_FLAGS += -D__ASSEMBLER__
+S_FLAGS += -Iinclude
+S_FLAGS += -Wall
+# Do optimizations do anything to assembly code???
+S_FLAGS += -Og -g
+
+### Linker flags ###
+LD_FLAGS += -nostdlib
+
+
+
+# Build rules
 .PHONY: all
-all: konglig
+all: $(BUILDDIR) $(ELF)
 
-.PHONY: konglig
-konglig:
-	$(MAKE) -C konglig all 
+.PHONY: clean
+clean: 
+	@rm -fr $(BUILDDIR) $(ELF)
 
-.PHONY: clean 
-clean:
-	$(MAKE) -C konglig clean 
+$(BUILDDIR): 
+	@mkdir -p $@
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(C_FLAGS) -c $< -o $@
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.S
+	$(CC) $(S_FLAGS) -c $< -o $@
+
+$(ELF): $(S_OBJECTS) $(C_OBJECTS)
+	$(CC) $(LD_FLAGS) $(S_OBJECTS) $(C_OBJECTS) -o $@
