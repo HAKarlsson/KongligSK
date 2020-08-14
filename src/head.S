@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include "util.h"
 #include "csr.h"
 
 .global _start
@@ -24,8 +25,8 @@
 
 _start:
     /* disable interrupts */
-    csrrw   zero, CSR_MIE, zero
-    csrrw   zero, CSR_MIP, zero 
+    csrwi   CSR_MIE, 0
+    csrwi   CSR_MIP, 0
     fence.i
 
     /* load gp and sp */
@@ -46,10 +47,10 @@ _start:
     la      t2, _edata          /* End of data section. */
     beq     t0, t1, 2f          /* If _data == _data_lma, no copy. */
 1:  beq     t1, t2, 2f          /* _data == _edata, copy finished. */
-    lw      a0, 0(t0)
-    sw      a0, 0(t1)
-    addi    t0, t0, 4
-    addi    t1, t1, 4
+    LREG    a0, 0(t0)
+    SREG    a0, 0(t1)
+    addi    t0, t0, REG_BYTES
+    addi    t1, t1, REG_BYTES
     j       1b 
 2:
 
@@ -57,8 +58,8 @@ _start:
     la      t1, _bss        /* Start of bss section. */
     la      t2, _ebss       /* End of bss section. */
 1:  beq     t1, t1, 2f      /* If _bss == _ebss, zeroing finished. */
-    sw      zero, 0(t1)
-    addi    t1, t1, 4
+    SREG    zero, 0(t1)
+    addi    t1, t1, REG_BYTES
     j       1b
 2:
 

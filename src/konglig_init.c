@@ -24,12 +24,12 @@ void cpu_init(void) {
 }
 
 void kernel_init(void) {
-    csrw(CSR_MSTATUS, 0); 
+    CSRWI(CSR_MSTATUS, 0); 
     pcb_t pcb = kernel.processes[0];
-    csrw(CSR_PMPCFG0, pcb.pmpcfg[0]);
-    csrw(CSR_PMPADDR0, pcb.pmpaddr[0]);
+    CSRW(CSR_PMPCFG0, pcb.pmpcfg[0]);
+    CSRW(CSR_PMPADDR0, pcb.pmpaddr[0]);
     /* We should write to MTVEC last. This causes initialization 
      * exception to be caught in head.S. */
-    csrw(CSR_MTVEC, (uintptr_t)trap_entry);
+    CSRW(CSR_MTVEC, (uintptr_t)trap_entry);
     trap_exit(&pcb);
 }
