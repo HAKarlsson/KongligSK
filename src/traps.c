@@ -1,27 +1,27 @@
-/* 
+/*
  * This file is part of KongligSK.
  * Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
- * 
+ *
  * KongligSK is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * KongligSK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "traps.h"
-#include "syscall.h"
-#include "util.h"
 #include "csr.h"
+#include "syscall.h"
 #include "user_trap.h"
+#include "util.h"
 
-typedef pcb_t* (*handler_t)(pcb_t*, uintptr_t, uintptr_t);
+typedef pcb_t *(*handler_t)(pcb_t *, uintptr_t, uintptr_t);
 
 const handler_t exception_handlers[] = {
     [MCAUSE_INSTRUCTION_ADDRESS_MISALIGNED] = handle_user_excpt,
@@ -40,10 +40,10 @@ const handler_t exception_handlers[] = {
     [MCAUSE_STORE_PAGE_FAULT] = 0,
 };
 
-pcb_t* handle_excpt(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) {
-    return exception_handlers[mcause](pcb, mcause, mtval);
+pcb_t *handle_excpt(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) {
+  return exception_handlers[mcause](pcb, mcause, mtval);
 }
 
-pcb_t* handle_intrp(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) {
-    return pcb;
+pcb_t *handle_intrp(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) {
+  return pcb;
 }
