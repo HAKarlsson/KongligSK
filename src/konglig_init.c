@@ -19,7 +19,8 @@
 #include "entry.h"
 #include "kernel.h"
 
-void cpu_init(void) { /* Set CPU frequency and so on. */ }
+void cpu_init(void) { /* Set CPU frequency and so on. */
+}
 
 void kernel_init(void) {
   CSRWI(CSR_MSTATUS, 0);

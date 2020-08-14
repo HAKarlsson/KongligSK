@@ -24,6 +24,7 @@
 
 typedef pcb_t *(*handler_t)(pcb_t *pcb);
 
+/* Placeholder. */
 pcb_t *ksk_Nothing(pcb_t *pcb) { return pcb; }
 
 static handler_t syscall_handlers[] = {

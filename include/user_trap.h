@@ -20,6 +20,16 @@
 #include "pcb.h"
 #include "types.h"
 
+/**
+ * Delegate an exception to pcb, a user-mode process.
+ * mcause and mtval holds the exception type and auxiliary information.
+ */
 pcb_t *handle_user_excpt(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval);
+
+/**
+ * Delegate an interrupt to pcb, a user-mode process.
+ * mcause holds the interrupt type.
+ */
+pcb_t *handle_user_intrp(pcb_t *pcb, uintptr_t mcause);
 
 #endif /* _USER_EXCPT_H */

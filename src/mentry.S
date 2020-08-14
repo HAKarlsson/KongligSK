@@ -90,15 +90,15 @@ trap_entry:
     /* 
      * If mcause < 0 (e.g., mcause.msb == 1) 
      * then
-     *   jump to handle_intrp(pcb, mcause, mtval)
+     *   jump to handle_intrp(pcb, mcause)
      * else
      *   jump to handle_excpt(pcb, mcause, mtval)
      */
     csrr    a1, CSR_MCAUSE
-    csrr    a2, CSR_MTVAL
     bgez    a1, 1f
     j       handle_intrp  
-1:  j       handle_excpt
+1:  csrr    a2, CSR_MTVAL
+    j       handle_excpt
 
 /* trap_exit(pcb_t* pcb) */
 trap_exit:

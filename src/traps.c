@@ -44,6 +44,4 @@ pcb_t *handle_excpt(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) {
   return exception_handlers[mcause](pcb, mcause, mtval);
 }
 
-pcb_t *handle_intrp(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) {
-  return pcb;
-}
+pcb_t *handle_intrp(pcb_t *pcb, uintptr_t mcause) { return pcb; }
