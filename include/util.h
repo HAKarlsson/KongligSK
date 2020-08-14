@@ -24,6 +24,8 @@
 #define COLD __attribute__ ((cold))
 
 
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+
 /* Use a on RV32, b on RV64 */
 #if __riscv_xlen == 32
 #define SEL(a, b) a

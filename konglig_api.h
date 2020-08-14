@@ -38,7 +38,7 @@ inline int ksk_Recv(int process_id, char message[16]) __ALWAYS_INLINE__;
 /**
  * Yield the remaining time slice to process. 
  */
-inline void ksk_YieldTo(int process_id) __ALWAYS_INLINE__;
+inline int ksk_YieldTo(int process_id) __ALWAYS_INLINE__;
 
 /*** Pseudo system calls ***/
 /**

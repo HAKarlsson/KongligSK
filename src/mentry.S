@@ -25,7 +25,7 @@
 .extern __global_pointer$
 .extern _sp
 
-.section .text.traps
+.section .text.entry
 /* Trap vector MUST be 4 byte aligned for _DIRECT_ MTVEC mode.*/
 .align 4 
 /* trap_entry(void) */
@@ -84,15 +84,21 @@ trap_entry:
 .option pop
     la      sp, _sp
 
-    /* Call interrupt or exception handler. */
+    /* Set return address (ra) to trap_exit */
+    la      ra, trap_exit
+
+    /* 
+     * If mcause < 0 (e.g., mcause.msb == 1) 
+     * then
+     *   jump to handle_intrp(pcb, mcause, mtval)
+     * else
+     *   jump to handle_excpt(pcb, mcause, mtval)
+     */
     csrr    a1, CSR_MCAUSE
     csrr    a2, CSR_MTVAL
     bgez    a1, 1f
-    /* handle_intrp(pcb_t *pcb, long mcause, long mtval) */
-    call    handle_intrp  
-    j       trap_exit
-    /* handle_excpt(pcb_t *pcb, long mcause, long mtval) */
-1:  call    handle_excpt
+    j       handle_intrp  
+1:  j       handle_excpt
 
 /* trap_exit(pcb_t* pcb) */
 trap_exit:

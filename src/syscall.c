@@ -16,12 +16,31 @@
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "traps.h"
+#include "syscall.h"
+#include "user_excpt.h"
+#include "csr.h"
+#include "inst_code.h"
+#include "util.h"
 
 typedef pcb_t* (*handler_t)(pcb_t *pcb);
 
-
-pcb_t* handle_syscall(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) {
-    pcb->gr[GR_PC] += 4;
+pcb_t* ksk_Nothing(pcb_t *pcb) {
     return pcb;
 }
+
+static handler_t syscall_handlers[] = {
+    [0] = ksk_Nothing,
+    [1] = ksk_Nothing,
+    [2] = ksk_Nothing,
+    [3] = ksk_Nothing,
+};
+
+pcb_t* handle_syscall(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) {
+    uintptr_t syscall_number = pcb->gr[GR_T0];
+    if (syscall_number < ARRAY_SIZE(syscall_handlers)) {
+        return syscall_handlers[syscall_number](pcb);
+    } else {
+        return handle_user_excpt(pcb, MCAUSE_ILLEGAL_INSTRUCTION, INST_ECALL);
+    }
+}
+

@@ -15,13 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef _TRAPS_H
-#define _TRAPS_H
+#ifndef _USER_EXCPT_H
+#define _USER_EXCPT_H
 #include "pcb.h"
 #include "types.h"
-#include "util.h"
 
-pcb_t* handle_excpt(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval); 
-pcb_t* handle_intrp(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval);
+pcb_t* handle_user_excpt(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval); 
 
-#endif /* _TRAPS_H */
+#endif /* _USER_EXCPT_H */

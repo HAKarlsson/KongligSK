@@ -23,6 +23,7 @@
 .extern _sp
 .extern 
 
+.section .text.init
 _start:
     /* disable interrupts */
     csrwi   CSR_MIE, 0

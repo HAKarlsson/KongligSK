@@ -16,7 +16,7 @@
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "csr.h"
-#include "traps.h"
+#include "entry.h"
 #include "kernel.h"
 
 void cpu_init(void) {
@@ -30,6 +30,6 @@ void kernel_init(void) {
     CSRW(CSR_PMPADDR0, pcb.pmpaddr[0]);
     /* We should write to MTVEC last. This causes initialization 
      * exception to be caught in head.S. */
-    CSRW(CSR_MTVEC, (uintptr_t)trap_entry);
+    CSRW(CSR_MTVEC, trap_entry);
     trap_exit(&pcb);
 }
