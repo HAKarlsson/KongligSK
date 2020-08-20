@@ -35,7 +35,7 @@ HEADERS   = $(wildcard $(HDRDIR)/*.h)
 C_FLAGS += -std=c99 
 C_FLAGS += -Iinclude
 C_FLAGS += -Wall -Wextra -Wno-unused-parameter
-C_FLAGS += -Og -g
+C_FLAGS += -O2 -g
 
 ### Assembly flags ###
 # __ASSEMBLER__ is already defined for GCC, 
@@ -47,7 +47,7 @@ S_FLAGS += -g
 
 ### Linker flags ###
 LD_FLAGS += -nostdlib
-LD_FLAGS += -T $(MEMORY)
+LD_FLAGS += -T fe310.lds
 LD_FLAGS += -T konglig.lds
 
 

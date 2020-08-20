@@ -17,7 +17,7 @@
  */
 #ifndef _TRAPS_H
 #define _TRAPS_H
-#include "pcb.h"
+#include "kernel.h"
 #include "types.h"
 #include "util.h"
 
@@ -25,12 +25,12 @@
  * Handles an exception for the process pcb, using mcause to determine the
  * exception type. mtval is the auxiliary information for the trap.
  */
-pcb_t *handle_excpt(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval);
+pcb_t *handle_excpt(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause, uintptr_t mtval);
 
 /**
  * Handles an interrupt for the process pcb, using mcause to determine the
  * interrupt type.
  */
-pcb_t *handle_intrp(pcb_t *pcb, uintptr_t mcause);
+pcb_t *handle_intrp(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause);
 
 #endif /* _TRAPS_H */

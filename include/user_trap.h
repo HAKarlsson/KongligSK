@@ -17,19 +17,19 @@
  */
 #ifndef _USER_EXCPT_H
 #define _USER_EXCPT_H
-#include "pcb.h"
+#include "kernel.h"
 #include "types.h"
 
 /**
  * Delegate an exception to pcb, a user-mode process.
  * mcause and mtval holds the exception type and auxiliary information.
  */
-pcb_t *handle_user_excpt(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval);
+pcb_t *handle_user_excpt(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause, uintptr_t mtval);
 
 /**
  * Delegate an interrupt to pcb, a user-mode process.
  * mcause holds the interrupt type.
  */
-pcb_t *handle_user_intrp(pcb_t *pcb, uintptr_t mcause);
+pcb_t *handle_user_intrp(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause);
 
 #endif /* _USER_EXCPT_H */

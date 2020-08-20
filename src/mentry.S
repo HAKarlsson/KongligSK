@@ -18,27 +18,21 @@
 #include "csr.h"
 #include "gr_offset.h"
 
-.global trap_exit 
-.global trap_entry
 .extern handle_excpt
 .extern handle_intrp
 .extern __global_pointer$
-.extern _sp
+.extern __stack_top
+.extern kernel
 
-.section .text.entry
-/* Trap vector MUST be 4 byte aligned for _DIRECT_ MTVEC mode.*/
+.section .text.trap
 .align 4 
 /* trap_entry(void) */
+.global trap_entry
 trap_entry:
+    .cfi_startproc /* trap_entry */
+    .cfi_undefined ra /*?*/
     /* Swap a0 with PCB pointer in MSCRATCH. */
     csrrw   a0, CSR_MSCRATCH, a0
-
-/* 
- * Here we can add checks for exceptions or interrupts in the kernel, 
- * but we assume the kernel is error free and non preemptible. This
- * removes expensive branching.
- */
-
     /* Save user context to PCB. */
     /* Save general purpose registers. */
     SREG    ra, GR_RA(a0)  
@@ -77,12 +71,15 @@ trap_entry:
     csrr    t1, CSR_MEPC
     SREG    t1, GR_PC(a0)
 
-    /* Load kernel gp and sp. */
+    /* Load kernel gp, sp, and fp (s0). */
 .option push
 .option norelax
     la      gp, __global_pointer$
 .option pop
-    la      sp, _sp
+    la      sp, __stack_top
+    mv      s0, sp
+    /* load pointer to kernel struct */
+    la      a1, kernel
 
     /* Set return address (ra) to trap_exit */
     la      ra, trap_exit
@@ -90,18 +87,22 @@ trap_entry:
     /* 
      * If mcause < 0 (e.g., mcause.msb == 1) 
      * then
-     *   jump to handle_intrp(pcb, mcause)
+     *   jump to handle_intrp(pcb, kernel, mcause)
      * else
-     *   jump to handle_excpt(pcb, mcause, mtval)
+     *   jump to handle_excpt(pcb, kernel, mcause, mtval)
      */
-    csrr    a1, CSR_MCAUSE
-    bgez    a1, 1f
+    csrr    a2, CSR_MCAUSE
+    bgez    a2, 1f
     j       handle_intrp  
-1:  csrr    a2, CSR_MTVAL
+1:  csrr    a3, CSR_MTVAL
     j       handle_excpt
+    .cfi_endproc /* trap_entry */
 
 /* trap_exit(pcb_t* pcb) */
+.global trap_exit
 trap_exit:
+    .cfi_startproc /* trap_exit */
+    .cfi_undefined ra
     /* We store a pointer to the PCB in MSCRATCH. */
     csrw    CSR_MSCRATCH, a0
     /* Load user context from PCB. */
@@ -142,3 +143,5 @@ trap_exit:
     LREG    a0, GR_A0(a0)
     /* Return to user context. */
     mret
+    .cfi_endproc /* trap_exit */
+    .end /* end of assembly */

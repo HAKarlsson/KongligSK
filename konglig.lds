@@ -29,13 +29,13 @@ MEMORY
 
 SECTIONS
 {
-        /* 1 KiB stack */
-        __stack_size = DEFINED(__stack_size) ? __stack_size : 0x200;
+        /* 1024 B stack */
+        __stack_size = DEFINED(__stack_size) ? __stack_size : 0x400;
         PROVIDE(__stack_size = __stack_size);
 
         .text : {
                 KEEP(*(.text.init))
-                KEEP(*(.text.entry))
+                KEEP(*(.text.trap))
                 *(.text)
                 *(.text.*)
                 . = ALIGN(8); 
@@ -69,5 +69,5 @@ SECTIONS
         .stack ORIGIN(ram) + LENGTH(ram) - __stack_size : {
             . += __stack_size;
         } >ram AT>ram
-        PROVIDE(_sp = ADDR(.stack) + SIZEOF(.stack));
+        PROVIDE(__stack_top = ADDR(.stack) + SIZEOF(.stack));
 }

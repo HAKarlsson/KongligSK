@@ -20,8 +20,8 @@
 
 .global _start
 .extern __global_pointer$
-.extern _sp
-.extern 
+.extern __stack_top
+.extern kernel_init
 
 .section .text.init
 _start:
@@ -35,7 +35,7 @@ _start:
 .option norelax
     la      gp, __global_pointer$
 .option pop
-    la      sp, _sp
+    la      sp, __stack_top
 
     /* Set trap vector to hang. */
     /* If we get an error in the initilization, we jump to hang. */

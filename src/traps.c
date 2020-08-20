@@ -21,7 +21,7 @@
 #include "user_trap.h"
 #include "util.h"
 
-typedef pcb_t *(*handler_t)(pcb_t *, uintptr_t, uintptr_t);
+typedef pcb_t *(*handler_t)(pcb_t *, kernel_t *kernel, uintptr_t, uintptr_t);
 
 const handler_t exception_handlers[] = {
     [MCAUSE_INSTRUCTION_ADDRESS_MISALIGNED] = handle_user_excpt,
@@ -40,8 +40,8 @@ const handler_t exception_handlers[] = {
     [MCAUSE_STORE_PAGE_FAULT] = 0,
 };
 
-pcb_t *handle_excpt(pcb_t *pcb, uintptr_t mcause, uintptr_t mtval) {
-  return exception_handlers[mcause](pcb, mcause, mtval);
+pcb_t *handle_excpt(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause, uintptr_t mtval) {
+  return exception_handlers[mcause](pcb, kernel, mcause, mtval);
 }
 
-pcb_t *handle_intrp(pcb_t *pcb, uintptr_t mcause) { return pcb; }
+pcb_t *handle_intrp(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause) { return pcb; }
