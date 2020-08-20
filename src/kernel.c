@@ -12,4 +12,5 @@ pcb_t *load_pcb(pcb_t *pcb) {
     CSRW(CSR_PMPADDR5, pcb->pmpaddr[5]);
     CSRW(CSR_PMPADDR6, pcb->pmpaddr[6]);
     CSRW(CSR_PMPADDR7, pcb->pmpaddr[7]);
+    return pcb;
 }
