@@ -17,7 +17,8 @@
  */
 #include "kernel.h"
 #include "csr.h"
-#include "entry.h"
+#include "mentry.h"
+#include "pmp.h"
 #include "kernel.h"
 
 void cpu_init(void) { /* Set CPU frequency and so on. */
@@ -25,9 +26,6 @@ void cpu_init(void) { /* Set CPU frequency and so on. */
 
 void kernel_init(void) {
   CSRWI(CSR_MSTATUS, 0);
-  pcb_t *pcb = &kernel.processes[0];
-  /* We should write to MTVEC last. This causes initialization
-   * exception to be caught in head.S. */
   CSRW(CSR_MTVEC, trap_entry);
-  trap_exit(load_pcb(pcb));
+  trap_exit(load_pmp(&kernel.processes[0]));
 }

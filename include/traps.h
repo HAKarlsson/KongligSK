@@ -31,6 +31,6 @@ pcb_t *handle_excpt(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause, uintptr_t mt
  * Handles an interrupt for the process pcb, using mcause to determine the
  * interrupt type.
  */
-pcb_t *handle_intrp(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause);
+pcb_t *handle_intrp(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause, uintptr_t mtval);
 
 #endif /* _TRAPS_H */

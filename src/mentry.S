@@ -16,7 +16,7 @@
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "csr.h"
-#include "reg_offset.h"
+#include "pcb_offset.h"
 
 .extern handle_excpt
 .extern handle_intrp
@@ -29,53 +29,58 @@
 /* trap_entry(void) */
 .global trap_entry
 trap_entry:
-    .cfi_startproc /* trap_entry */
-    .cfi_undefined ra /*?*/
     /* Swap a0 with PCB pointer in MSCRATCH. */
-    csrrw   a0, CSR_MSCRATCH, a0
+    csrrw   a0, mscratch, a0
     /* Save user context to PCB. */
     /* Save general purpose registers. */
-    SREG    ra, REG_RA(a0)  
-    SREG    sp, REG_SP(a0)  
-    SREG    gp, REG_GP(a0)  
-    SREG    tp, REG_TP(a0)  
-    SREG    t0, REG_T0(a0)  
-    SREG    t1, REG_T1(a0)  
-    SREG    t2, REG_T2(a0)  
-    SREG    s0, REG_S0(a0)  
-    SREG    s1, REG_S1(a0)  
-    SREG    a1, REG_A1(a0)  
-    SREG    a2, REG_A2(a0)  
-    SREG    a3, REG_A3(a0)  
-    SREG    a4, REG_A4(a0)  
-    SREG    a5, REG_A5(a0)  
-    SREG    a6, REG_A6(a0)  
-    SREG    a7, REG_A7(a0)  
-    SREG    s2, REG_S2(a0)  
-    SREG    s3, REG_S3(a0)  
-    SREG    s4, REG_S4(a0)  
-    SREG    s5, REG_S5(a0)  
-    SREG    s6, REG_S6(a0)  
-    SREG    s7, REG_S7(a0)  
-    SREG    s8, REG_S8(a0)  
-    SREG    s9, REG_S9(a0)  
-    SREG    s10, REG_S10(a0) 
-    SREG    s11, REG_S11(a0) 
-    SREG    t3, REG_T3(a0)  
-    SREG    t4, REG_T4(a0)  
-    SREG    t5, REG_T5(a0)  
-    SREG    t6, REG_T6(a0)  
-    csrr    t0, CSR_MSCRATCH
-    SREG    t0, REG_A0(a0)
-    /* Save program counter. */
-    csrr    t1, CSR_MEPC
-    SREG    t1, REG_PC(a0)
+    SREG    ra, PCB_RA(a0) 
+    SREG    sp, PCB_SP(a0)  
+    SREG    gp, PCB_GP(a0)  
+    SREG    tp, PCB_TP(a0)  
+    SREG    t0, PCB_T0(a0)  
+    SREG    t1, PCB_T1(a0)  
+    SREG    t2, PCB_T2(a0)  
+    SREG    s0, PCB_S0(a0)  
+    SREG    s1, PCB_S1(a0)  
+    SREG    a1, PCB_A1(a0)  
+    SREG    a2, PCB_A2(a0)  
+    SREG    a3, PCB_A3(a0)  
+
+    /* Read CSRs early because latency! */
+    csrr    t0, mscratch    
+    csrr    t1, mepc 
+    csrr    a2, mcause 
+    csrr    a3, mtval 
+
+    SREG    a4, PCB_A4(a0)  
+    SREG    a5, PCB_A5(a0)  
+    SREG    a6, PCB_A6(a0)  
+    SREG    a7, PCB_A7(a0)  
+    SREG    s2, PCB_S2(a0)  
+    SREG    s3, PCB_S3(a0)  
+    SREG    s4, PCB_S4(a0)  
+    SREG    s5, PCB_S5(a0)  
+    SREG    s6, PCB_S6(a0)  
+    SREG    s7, PCB_S7(a0)  
+    SREG    s8, PCB_S8(a0)  
+    SREG    s9, PCB_S9(a0)  
+    SREG    s10, PCB_S10(a0) 
+    SREG    s11, PCB_S11(a0) 
+    SREG    t3, PCB_T3(a0)  
+    SREG    t4, PCB_T4(a0)  
+    SREG    t5, PCB_T5(a0)  
+    SREG    t6, PCB_T6(a0)  
+
+    /* Save user a0 and pc.*/
+    SREG    t0, PCB_A0(a0)
+    SREG    t1, PCB_PC(a0)
 
     /* Load kernel gp, sp, and fp (s0). */
 .option push
 .option norelax
     la      gp, __global_pointer$
 .option pop
+    
     la      sp, __stack_top
     mv      s0, sp
     /* load pointer to kernel struct */
@@ -91,57 +96,49 @@ trap_entry:
      * else
      *   jump to handle_excpt(pcb, kernel, mcause, mtval)
      */
-    csrr    a2, CSR_MCAUSE
     bgez    a2, 1f
     j       handle_intrp  
-1:  csrr    a3, CSR_MTVAL
-    j       handle_excpt
-    .cfi_endproc /* trap_entry */
+1:  j       handle_excpt
 
 /* trap_exit(pcb_t* pcb) */
 .global trap_exit
 trap_exit:
-    .cfi_startproc /* trap_exit */
-    .cfi_undefined ra
     /* We store a pointer to the PCB in MSCRATCH. */
-    csrw    CSR_MSCRATCH, a0
+    csrw    mscratch, a0
     /* Load user context from PCB. */
-    /* Restore program counter. */
-    LREG    t0, REG_PC(a0)
-    csrw    CSR_MEPC, t0
-    /* Restore general purpose registers. */
-    LREG    ra, REG_RA(a0)  
-    LREG    sp, REG_SP(a0)  
-    LREG    gp, REG_GP(a0)  
-    LREG    tp, REG_TP(a0)  
-    LREG    t0, REG_T0(a0)  
-    LREG    t1, REG_T1(a0)  
-    LREG    t2, REG_T2(a0)  
-    LREG    s0, REG_S0(a0)  
-    LREG    s1, REG_S1(a0)  
-    LREG    a1, REG_A1(a0)  
-    LREG    a2, REG_A2(a0)  
-    LREG    a3, REG_A3(a0)  
-    LREG    a4, REG_A4(a0)  
-    LREG    a5, REG_A5(a0)  
-    LREG    a6, REG_A6(a0)  
-    LREG    a7, REG_A7(a0)  
-    LREG    s2, REG_S2(a0)  
-    LREG    s3, REG_S3(a0)  
-    LREG    s4, REG_S4(a0)  
-    LREG    s5, REG_S5(a0)  
-    LREG    s6, REG_S6(a0)  
-    LREG    s7, REG_S7(a0)  
-    LREG    s8, REG_S8(a0)  
-    LREG    s9, REG_S9(a0)  
-    LREG    s10, REG_S10(a0) 
-    LREG    s11, REG_S11(a0) 
-    LREG    t3, REG_T3(a0)  
-    LREG    t4, REG_T4(a0)  
-    LREG    t5, REG_T5(a0)  
-    LREG    t6, REG_T6(a0)  
-    LREG    a0, REG_A0(a0)
+    LREG    t0, PCB_PC(a0)
+    LREG    ra, PCB_RA(a0)
+    LREG    sp, PCB_SP(a0)
+    LREG    gp, PCB_GP(a0)
+    LREG    tp, PCB_TP(a0)
+    csrw    mepc, t0
+    LREG    t0, PCB_T0(a0)
+    LREG    t1, PCB_T1(a0)
+    LREG    t2, PCB_T2(a0)
+    LREG    s0, PCB_S0(a0)
+    LREG    s1, PCB_S1(a0)
+    LREG    a1, PCB_A1(a0)
+    LREG    a2, PCB_A2(a0)
+    LREG    a3, PCB_A3(a0)
+    LREG    a4, PCB_A4(a0)
+    LREG    a5, PCB_A5(a0)
+    LREG    a6, PCB_A6(a0)
+    LREG    a7, PCB_A7(a0)
+    LREG    s2, PCB_S2(a0)
+    LREG    s3, PCB_S3(a0)
+    LREG    s4, PCB_S4(a0)
+    LREG    s5, PCB_S5(a0)
+    LREG    s6, PCB_S6(a0)
+    LREG    s7, PCB_S7(a0)
+    LREG    s8, PCB_S8(a0)
+    LREG    s9, PCB_S9(a0)
+    LREG    s10, PCB_S10(a0)
+    LREG    s11, PCB_S11(a0)
+    LREG    t3, PCB_T3(a0)
+    LREG    t4, PCB_T4(a0)
+    LREG    t5, PCB_T5(a0)
+    LREG    t6, PCB_T6(a0)
+    LREG    a0, PCB_A0(a0)
     /* Return to user context. */
     mret
-    .cfi_endproc /* trap_exit */
-    .end /* end of assembly */
+.end

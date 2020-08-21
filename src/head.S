@@ -36,6 +36,7 @@ _start:
     la      gp, __global_pointer$
 .option pop
     la      sp, __stack_top
+    mv      s0, sp
 
     /* Set trap vector to hang. */
     /* If we get an error in the initilization, we jump to hang. */
@@ -71,3 +72,4 @@ _start:
 hang:
     ebreak
     j       hang
+.end

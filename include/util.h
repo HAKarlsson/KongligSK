@@ -27,8 +27,10 @@
 
 /* Use a on RV32, b on RV64 */
 #if __riscv_xlen == 32
+#define RV32
 #define SEL(a, b) a
 #else
+#define RV64
 #define SEL(a, b) b
 #endif
 
@@ -38,10 +40,11 @@
 #define REG_BITS SEL(32, 64)
 
 #define ONES SEL(0xFFFFFFFFUL, 0xFFFFFFFFFFFFFFFFUL)
+#define MSb  SEL(0x80000000UL, 0x8000000000000000UL)
 
 /* Set bit n. */
 #define BIT(n) (1 << (n))
-/* TODO: Set bits n, n+1, ..., m-1. */
-#define BITS(n, m) (0)
+/* Set bits n, n+1, ..., m-1. */
+#define BITS(n, m) ((ONES << n) & (ONES >>> (REG_BITS - m)))
 
 #endif /* _UTIL_H */

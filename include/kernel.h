@@ -85,6 +85,4 @@ typedef struct kernel {
 
 extern kernel_t kernel;
 
-pcb_t *load_pcb(pcb_t *pcb);
-
 #endif /* _KERNEL_H */

@@ -17,6 +17,7 @@
  */
 
 #include "kernel.h"
+#include "pmp.h"
 #include "syscall.h"
 #include "inst_code.h"
 #include "csr.h"
@@ -34,7 +35,7 @@ pcb_t *ksk_YieldTo(pcb_t *pcb, kernel_t *kernel) {
     if (target >= PCB_NUM)
         return pcb;
     /* Return the target process. */
-    return load_pcb(&kernel->processes[target]);
+    return load_pmp(&kernel->processes[target]);
 }
 
 pcb_t *ksk_Send(pcb_t *pcb, kernel_t *kernel) {
