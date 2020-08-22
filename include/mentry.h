@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef _ENTRY_H
-#define _ENTRY_H
+#ifndef KSK_ENTRY_H
+#define KSK_ENTRY_H
 #include "kernel.h"
 #include "util.h"
-void trap_entry(void) NO_RETURN;
-void trap_exit(pcb_t *pcb) NO_RETURN;
-#endif /* _ENTRY_H */
+void TrapEntry(void) NO_RETURN;
+void TrapExit(Process *proc) NO_RETURN;
+#endif /* KSK_ENTRY_H */

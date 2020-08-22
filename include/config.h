@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef _CONFIG_H
-#define _CONFIG_H
+#ifndef KSK_CONFIG_H
+#define KSK_CONFIG_H
 
-#define PCB_NUM 2
+#define PROCESS_NUM 2
 
 #endif /* _CONFIG_H */

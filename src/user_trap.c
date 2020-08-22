@@ -17,15 +17,16 @@
  */
 #include "user_trap.h"
 
-pcb_t *handle_user_excpt(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause, uintptr_t mtval) {
+Process *HandleUserException(Process *proc, Kernel *kernel, uintptr_t mcause,
+                             uintptr_t mtval) {
   /* Save user pc. */
-  pcb->trap_regs[UEPC] = pcb->regs[PC];
+  proc->trap_regs[UEPC] = proc->regs[PC];
   /* Save trap information. */
-  pcb->trap_regs[UCAUSE] = mcause;
-  pcb->trap_regs[UTVAL] = mtval;
+  proc->trap_regs[UCAUSE] = mcause;
+  proc->trap_regs[UTVAL] = mtval;
   /* Disable interrupts and set UPIE if UIE */
-  pcb->trap_regs[USTATUS] = (pcb->trap_regs[USTATUS] & 1) << 4;
-  /* Jump to trap handler. */
-  pcb->regs[PC] = pcb->trap_regs[UTVEC] & ~3UL;
-  return pcb;
+  proc->trap_regs[USTATUS] = (proc->trap_regs[USTATUS] & 1) << 4;
+  /* User jumps to trap handler. */
+  proc->regs[PC] = proc->trap_regs[UTVEC] & ~3UL;
+  return proc;
 }

@@ -1,8 +1,8 @@
-/* load_pmp(pcb_t* pcb) */
 #include "pcb_offset.h"
 .section .text
-.global load_pmp 
-load_pmp:
+/* LoadPMP(pcb_t* pcb) */
+.global LoadPMP 
+LoadPMP:
     /* Load from memory first. */
     /* We only want to use callee saved regs. */
     LREG    t0, PCB_PMPCFG0(a0)

@@ -15,21 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef _USER_EXCPT_H
-#define _USER_EXCPT_H
+#ifndef KSK_USER_EXCPT_H
+#define KSK_USER_EXCPT_H
 #include "kernel.h"
 #include "types.h"
 
 /**
- * Delegate an exception to pcb, a user-mode process.
+ * Delegate an exception to proc.
  * mcause and mtval holds the exception type and auxiliary information.
  */
-pcb_t *handle_user_excpt(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause, uintptr_t mtval);
+Process *HandleUserException(Process *proc, Kernel *kernel, uintptr_t mcause,
+                         uintptr_t mtval);
 
 /**
- * Delegate an interrupt to pcb, a user-mode process.
+ * Delegate an interrupt to proc.
  * mcause holds the interrupt type.
  */
-pcb_t *handle_user_intrp(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause);
+Process *HandleUserInterrupt(Process *proc, Kernel *kernel, uintptr_t mcause);
 
-#endif /* _USER_EXCPT_H */
+#endif /* KSK_USER_EXCPT_H */

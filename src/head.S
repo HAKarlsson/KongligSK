@@ -66,8 +66,8 @@ _start:
 2:
 
 /* initialize the kernel */
-    /* kernel_init(void) */
-    call     kernel_init
+    /* InitKernel(void) */
+    call    InitKernel 
 
 hang:
     ebreak

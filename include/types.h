@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef _TYPES_H
-#define _TYPES_H
+#ifndef KSK_TYPES_H
+#define KSK_TYPES_H
 typedef long intptr_t;
 typedef unsigned long uintptr_t;
 typedef int int32_t;
 typedef unsigned int uint32_t;
 typedef long long int64_t;
 typedef unsigned long long uint64_t;
-#endif
+#endif /* KSK_TYPES_H */

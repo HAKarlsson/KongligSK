@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef _KERNEL_H
-#define _KERNEL_H
+#ifndef KSK_KERNEL_H
+#define KSK_KERNEL_H
 #include "config.h"
-#include "util.h"
 #include "types.h"
+#include "util.h"
 
-#define MSGS_LEN SEL(4,2)
+#define MSGS_LEN SEL(4, 2)
 
 #define PC 0
 #define RA 1
@@ -66,23 +66,24 @@
 #define UIP 7
 
 typedef struct inbox {
-    uintptr_t full;
-    uintptr_t msgs[MSGS_LEN];
-} inbox_t;
+  uintptr_t full;
+  uintptr_t msgs[MSGS_LEN];
+} Inbox;
 
-typedef struct pcb {
-    uintptr_t regs[32];
-    uint64_t pmpcfg0;
-    uintptr_t pmpaddr[8];
-    uintptr_t trap_regs[8];
-    uintptr_t id;
-} pcb_t;
+/* PCB of a user-mode process. */
+typedef struct process {
+  uintptr_t regs[32];
+  uint64_t pmpcfg0;
+  uintptr_t pmpaddr[8];
+  uintptr_t trap_regs[8];
+  uintptr_t id;
+} Process;
 
 typedef struct kernel {
-    pcb_t processes[PCB_NUM];
-    inbox_t inboxes[PCB_NUM][PCB_NUM];
-} kernel_t;
+  Process processes[PROCESS_NUM];
+  Inbox inboxes[PROCESS_NUM][PROCESS_NUM];
+} Kernel;
 
-extern kernel_t kernel;
+extern Kernel kernel;
 
-#endif /* _KERNEL_H */
+#endif /* KSK_KERNEL_H */

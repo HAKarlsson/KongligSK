@@ -1,7 +1,7 @@
-#ifndef _PMP_H
-#define _PMP_H
+#ifndef KSK_PMP_H
+#define KSK_PMP_H
 #include "kernel.h"
 
-pcb_t *load_pmp(pcb_t *pcb);
+Process *LoadPMP(Process *proc);
 
-#endif /* _PMP_H */
+#endif /* KSK_PMP_H */

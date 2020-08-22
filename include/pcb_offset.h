@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef _REG_OFFSET_H
-#define _REG_OFFSET_H
+#ifndef KSK_REG_OFFSET_H
+#define KSK_REG_OFFSET_H
 #include "util.h"
 
 #define PCB_PC (REG_BYTES * 0)
@@ -75,6 +75,4 @@
 #define PCB_PMPADDR7 (REG_BYTES * 40)
 #endif
 
-
-
-#endif /* _REG_OFFSET_H */
+#endif /* KSK_REG_OFFSET_H */

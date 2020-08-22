@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef _CSR_H
-#define _CSR_H
+#ifndef KSK_CSR_H
+#define KSK_CSR_H
 #include "util.h"
 
 #ifndef __ASSEMBLER__
@@ -291,4 +291,4 @@
 #define USTATUS_UIE 0x1
 #define USTATUS_UPIE 0x10
 
-#endif /* _CSR_H */
+#endif /* KSK_CSR_H */

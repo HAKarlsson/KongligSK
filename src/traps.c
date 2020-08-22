@@ -16,23 +16,24 @@
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "traps.h"
+
 #include "csr.h"
 #include "syscall.h"
 #include "user_trap.h"
 #include "util.h"
 
-typedef pcb_t *(*handler_t)(pcb_t *, kernel_t *kernel, uintptr_t, uintptr_t);
+typedef Process *(*Handler)(Process *, Kernel *, uintptr_t, uintptr_t);
 
-const handler_t exception_handlers[] = {
-    [MCAUSE_INSTRUCTION_ADDRESS_MISALIGNED] = handle_user_excpt,
-    [MCAUSE_INSTRUCTION_ACCESS_FAULT] = handle_user_excpt,
+static const Handler exception_handlers[] = {
+    [MCAUSE_INSTRUCTION_ADDRESS_MISALIGNED] = HandleUserException,
+    [MCAUSE_INSTRUCTION_ACCESS_FAULT] = HandleUserException,
     [MCAUSE_ILLEGAL_INSTRUCTION] = 0,
-    [MCAUSE_BREAKPOINT] = handle_user_excpt,
-    [MCAUSE_LOAD_ADDRESS_MISALIGNED] = handle_user_excpt,
-    [MCAUSE_LOAD_ACCESS_FAULT] = handle_user_excpt,
-    [MCAUSE_STORE_ADDRESS_MISALIGNED] = handle_user_excpt,
-    [MCAUSE_STORE_ACCESS_FAULT] = handle_user_excpt,
-    [MCAUSE_UMODE_ECALL] = handle_syscall,
+    [MCAUSE_BREAKPOINT] = HandleUserException,
+    [MCAUSE_LOAD_ADDRESS_MISALIGNED] = HandleUserException,
+    [MCAUSE_LOAD_ACCESS_FAULT] = HandleUserException,
+    [MCAUSE_STORE_ADDRESS_MISALIGNED] = HandleUserException,
+    [MCAUSE_STORE_ACCESS_FAULT] = HandleUserException,
+    [MCAUSE_UMODE_ECALL] = HandleSyscall,
     [MCAUSE_SMODE_ECALL] = 0,
     [MCAUSE_MMODE_ECALL] = 0,
     [MCAUSE_INSTRUCTION_PAGE_FAULT] = 0,
@@ -40,8 +41,12 @@ const handler_t exception_handlers[] = {
     [MCAUSE_STORE_PAGE_FAULT] = 0,
 };
 
-pcb_t *handle_excpt(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause, uintptr_t mtval) {
+Process *HandleException(Process *pcb, Kernel *kernel, uintptr_t mcause,
+                         uintptr_t mtval) {
   return exception_handlers[mcause](pcb, kernel, mcause, mtval);
 }
 
-pcb_t *handle_intrp(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause, uintptr_t mtval) { return pcb; }
+Process *HandleInterrupt(Process *pcb, Kernel *kernel, uintptr_t mcause,
+                         uintptr_t mtval) {
+  return pcb;
+}

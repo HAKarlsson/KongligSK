@@ -18,17 +18,17 @@
 #include "csr.h"
 #include "pcb_offset.h"
 
-.extern handle_excpt
-.extern handle_intrp
+.extern HandleException
+.extern HandleInterrupt
 .extern __global_pointer$
 .extern __stack_top
 .extern kernel
 
 .section .text.trap
 .align 4 
-/* trap_entry(void) */
-.global trap_entry
-trap_entry:
+/* TrapEntry(void) */
+.global TrapEntry
+TrapEntry:
     /* Swap a0 with PCB pointer in MSCRATCH. */
     csrrw   a0, mscratch, a0
     /* Save user context to PCB. */
@@ -87,7 +87,7 @@ trap_entry:
     la      a1, kernel
 
     /* Set return address (ra) to trap_exit */
-    la      ra, trap_exit
+    la      ra, TrapExit
 
     /* 
      * If mcause < 0 (e.g., mcause.msb == 1) 
@@ -97,12 +97,12 @@ trap_entry:
      *   jump to handle_excpt(pcb, kernel, mcause, mtval)
      */
     bgez    a2, 1f
-    j       handle_intrp  
-1:  j       handle_excpt
+    j       HandleInterrupt  
+1:  j       HandleException 
 
-/* trap_exit(pcb_t* pcb) */
-.global trap_exit
-trap_exit:
+/* TrapExit(pcb_t* pcb) */
+.global TrapExit 
+TrapExit:
     /* We store a pointer to the PCB in MSCRATCH. */
     csrw    mscratch, a0
     /* Load user context from PCB. */

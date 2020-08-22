@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef _UTIL_H
-#define _UTIL_H
+#ifndef KSK_UTIL_H
+#define KSK_UTIL_H
 
 #define NO_RETURN __attribute__((noreturn))
 #define ALWAYS_INLINE __attribute__((always_inline))
@@ -40,11 +40,11 @@
 #define REG_BITS SEL(32, 64)
 
 #define ONES SEL(0xFFFFFFFFUL, 0xFFFFFFFFFFFFFFFFUL)
-#define MSb  SEL(0x80000000UL, 0x8000000000000000UL)
+#define MSb SEL(0x80000000UL, 0x8000000000000000UL)
 
 /* Set bit n. */
 #define BIT(n) (1 << (n))
 /* Set bits n, n+1, ..., m-1. */
 #define BITS(n, m) ((ONES << n) & (ONES >>> (REG_BITS - m)))
 
-#endif /* _UTIL_H */
+#endif /* KSK_UTIL_H */

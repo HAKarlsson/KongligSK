@@ -15,22 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef _TRAPS_H
-#define _TRAPS_H
+#ifndef KSK_TRAPS_H
+#define KSK_TRAPS_H
 #include "kernel.h"
 #include "types.h"
 #include "util.h"
 
 /**
- * Handles an exception for the process pcb, using mcause to determine the
+ * Handles an exception for the proc, using mcause to determine the
  * exception type. mtval is the auxiliary information for the trap.
  */
-pcb_t *handle_excpt(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause, uintptr_t mtval);
+ Process *HandleException(Process *proc, Kernel *kernel, uintptr_t mcause,
+                    uintptr_t mtval);
 
 /**
- * Handles an interrupt for the process pcb, using mcause to determine the
+ * Handles an interrupt for the proc, using mcause to determine the
  * interrupt type.
  */
-pcb_t *handle_intrp(pcb_t *pcb, kernel_t *kernel, uintptr_t mcause, uintptr_t mtval);
+Process *HandleInterrupt(Process *proc, Kernel *kernel, uintptr_t mcause,
+                    uintptr_t mtval);
 
-#endif /* _TRAPS_H */
+#endif /* KSK_TRAPS_H */

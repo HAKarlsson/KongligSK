@@ -15,17 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "kernel.h"
 #include "csr.h"
+#include "kernel.h"
 #include "mentry.h"
 #include "pmp.h"
-#include "kernel.h"
 
-void cpu_init(void) { /* Set CPU frequency and so on. */
+void InitCPU(void) { /* Set CPU frequency and so on. */
 }
 
-void kernel_init(void) {
+void InitKernel(void) {
   CSRWI(CSR_MSTATUS, 0);
-  CSRW(CSR_MTVEC, trap_entry);
-  trap_exit(load_pmp(&kernel.processes[0]));
+  CSRW(CSR_MTVEC, TrapEntry);
+  TrapExit(LoadPMP(&kernel.processes[0]));
 }
