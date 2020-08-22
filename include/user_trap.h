@@ -25,7 +25,7 @@
  * mcause and mtval holds the exception type and auxiliary information.
  */
 Process *HandleUserException(Process *proc, Kernel *kernel, uintptr_t mcause,
-                         uintptr_t mtval);
+                             uintptr_t mtval);
 
 /**
  * Delegate an interrupt to proc.

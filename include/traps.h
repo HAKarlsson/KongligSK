@@ -25,14 +25,14 @@
  * Handles an exception for the proc, using mcause to determine the
  * exception type. mtval is the auxiliary information for the trap.
  */
- Process *HandleException(Process *proc, Kernel *kernel, uintptr_t mcause,
-                    uintptr_t mtval);
+Process *HandleException(Process *proc, Kernel *kernel, uintptr_t mcause,
+                         uintptr_t mtval);
 
 /**
  * Handles an interrupt for the proc, using mcause to determine the
  * interrupt type.
  */
 Process *HandleInterrupt(Process *proc, Kernel *kernel, uintptr_t mcause,
-                    uintptr_t mtval);
+                         uintptr_t mtval);
 
 #endif /* KSK_TRAPS_H */

@@ -20,5 +20,5 @@
 #include "kernel.h"
 #include "types.h"
 Process *HandleSyscall(Process *proc, Kernel *kernel, uintptr_t mcause,
-                      uintptr_t mtval);
+                       uintptr_t mtval);
 #endif /* KSK_SYSCALL_H */
