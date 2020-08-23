@@ -24,9 +24,11 @@
 .extern __stack_top
 .extern kernel
 
+.global TrapEntry
+.global TrapExit 
+
 .align 4 
 /* TrapEntry(void) */
-.global TrapEntry
 TrapEntry:
     /* Swap a0 with PCB pointer in mscratch. */
     csrrw   a0, mscratch, a0
@@ -82,22 +84,59 @@ TrapEntry:
     la      sp, __stack_top
     mv      s0, sp
 
+    /* pointer to current pcb to s1 */
+    mv      s1, a0
+
     /* load pointer to kernel struct */
     la      a1, kernel
 
     /* Set return address (ra) to TrapExit */
-    la      ra, TrapExit
     bgez    a2, exception 
 
 interrupt:
-    tail    HandleInterrupt
+    call    HandleInterrupt
+    j       after_trap 
 
 exception:
-    tail    HandleException
+    call    HandleException
 
-/* TrapExit(pcb_t* pcb) */
-.global TrapExit 
+after_trap:
+    /* TODO: Check machine timer interrupt in mip. */
+
+    /* If PCB is the same as before, skip PMP loading. */
+    beq     a0, s1, restore_context
+
 TrapExit:
+    /* Load PMP settings from memory first. */
+    /* We only want to use callee saved regs. */
+    LREG    t0, PCB_PMPCFG0(a0)
+#ifdef RV32
+    LREG    t1, PCB_PMPCFG1(a0)
+#endif
+    LREG    t2, PCB_PMPADDR0(a0)
+    LREG    a1, PCB_PMPADDR1(a0)
+    LREG    a2, PCB_PMPADDR2(a0)
+    LREG    a3, PCB_PMPADDR3(a0)
+    LREG    a4, PCB_PMPADDR4(a0)
+    LREG    a5, PCB_PMPADDR5(a0)
+    LREG    a6, PCB_PMPADDR6(a0)
+    LREG    a7, PCB_PMPADDR7(a0)
+    /* Here comes the pipeline flush!!! :/ */
+    /* Write to PMP registers. */
+    csrw    pmpcfg0, t0
+#ifdef RV32
+    csrw    pmpcfg1, t1
+#endif
+    csrw    pmpaddr0, t2
+    csrw    pmpaddr1, a1
+    csrw    pmpaddr2, a2
+    csrw    pmpaddr3, a3
+    csrw    pmpaddr4, a4
+    csrw    pmpaddr5, a5
+    csrw    pmpaddr6, a6
+    csrw    pmpaddr7, a7
+
+restore_context:
     /* We store a pointer to the PCB in MSCRATCH. */
     csrw    mscratch, a0
     /* Load user context from PCB. */

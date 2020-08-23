@@ -20,7 +20,6 @@
 #include "csr.h"
 #include "inst_code.h"
 #include "kernel.h"
-#include "pmp.h"
 #include "user_trap.h"
 #include "util.h"
 
@@ -32,7 +31,7 @@ Process *ksk_YieldTo(Process *proc, Kernel *kernel) {
   if (target >= PROCESS_NUM)
     return proc;
   /* Return the target process. */
-  return LoadPMP(&kernel->processes[target]);
+  return &kernel->processes[target];
 }
 
 Process *ksk_Send(Process *proc, Kernel *kernel) {

@@ -18,7 +18,6 @@
 #include "csr.h"
 #include "kernel.h"
 #include "mentry.h"
-#include "pmp.h"
 
 void InitCPU(void) { /* Set CPU frequency and so on. */
 }
@@ -26,5 +25,4 @@ void InitCPU(void) { /* Set CPU frequency and so on. */
 void InitKernel(void) {
   CSRWI(CSR_MSTATUS, 0);
   CSRW(CSR_MTVEC, TrapEntry);
-  TrapExit(LoadPMP(&kernel.processes[0]));
 }
