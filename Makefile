@@ -16,8 +16,10 @@
 
 # Tools
 CC = riscv64-unknown-elf-gcc
+#CC = clang --target=riscv64 /* produces larger code :/ */
 OBJDUMP = riscv64-unknown-elf-objdump
 SIZE = riscv64-unknown-elf-size
+LD = riscv64-unknown-elf-ld
 
 BUILDDIR ?= konglig_build
 
@@ -33,6 +35,7 @@ HEADERS   = $(wildcard $(HDRDIR)/*.h)
 
 ### C flags ###
 C_FLAGS += -std=c99 
+C_FLAGS += -mabi=lp64 -march=rv64imac -mcmodel=medany
 C_FLAGS += -Iinclude
 C_FLAGS += -Wall -Wextra -Wno-unused-parameter
 C_FLAGS += -O2 -g
@@ -41,16 +44,13 @@ C_FLAGS += -O2 -g
 # __ASSEMBLER__ is already defined for GCC, 
 # but maybe not other compilers.
 S_FLAGS += -D__ASSEMBLER__
+S_FLAGS += -mabi=lp64 -march=rv64imac -mcmodel=medany
 S_FLAGS += -Iinclude
-S_FLAGS += -Wall
-S_FLAGS += -g
+S_FLAGS += -O2 -g
 
 ### Linker flags ###
 LD_FLAGS += -nostdlib
-LD_FLAGS += -T fe310.lds
 LD_FLAGS += -T konglig.lds
-
-
 
 # Build rules
 .PHONY: all
@@ -78,6 +78,6 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.S $(HEADERS)
 	$(OBJDUMP) -d $@ > $@.da
 
 $(ELF): $(S_OBJECTS) $(C_OBJECTS)
-	$(CC) $(LD_FLAGS) $(S_OBJECTS) $(C_OBJECTS) -o $@
+	$(LD) $(LD_FLAGS) $(C_OBJECTS) $(S_OBJECTS) -o $@
 	$(OBJDUMP) -d $@ > $@.da
 	$(SIZE) $(S_OBJECTS) $(C_OBJECTS) $(ELF)

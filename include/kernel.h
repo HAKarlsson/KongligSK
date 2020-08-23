@@ -18,7 +18,6 @@
 #ifndef KSK_KERNEL_H
 #define KSK_KERNEL_H
 #include "config.h"
-#include "types.h"
 #include "util.h"
 
 #define MSGS_LEN SEL(4, 2)
@@ -64,6 +63,13 @@
 #define UCAUSE 5
 #define UTVAL 6
 #define UIP 7
+
+typedef long intptr_t;
+typedef unsigned long uintptr_t;
+typedef int int32_t;
+typedef unsigned int uint32_t;
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
 
 typedef struct inbox {
   uintptr_t full;

@@ -18,7 +18,6 @@
 #ifndef KSK_USER_EXCPT_H
 #define KSK_USER_EXCPT_H
 #include "kernel.h"
-#include "types.h"
 
 /**
  * Delegate an exception to proc.

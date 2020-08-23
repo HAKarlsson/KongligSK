@@ -18,8 +18,6 @@
 #ifndef KSK_TRAPS_H
 #define KSK_TRAPS_H
 #include "kernel.h"
-#include "types.h"
-#include "util.h"
 
 /**
  * Handles an exception for the proc, using mcause to determine the

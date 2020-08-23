@@ -18,7 +18,6 @@
 #ifndef KSK_ENTRY_H
 #define KSK_ENTRY_H
 #include "kernel.h"
-#include "util.h"
 void TrapEntry(void) NO_RETURN;
 void TrapExit(Process *proc) NO_RETURN;
 #endif /* KSK_ENTRY_H */

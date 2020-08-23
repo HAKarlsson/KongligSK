@@ -21,53 +21,24 @@ ENTRY(_start)
 
 MEMORY
 {
-        /* 64 KiB rom */
-        rom (rxai!w) : ORIGIN = rom, LENGTH = 0x2000
-        /* 4 KiB ram */
-        ram (wxa!ri) : ORIGIN = ram, LENGTH = 0x1000 
+        RAM (rwx) : ORIGIN = 0x80000000, LENGTH = 0x1000
 }
 
 SECTIONS
 {
-        /* 1024 B stack */
-        __stack_size = DEFINED(__stack_size) ? __stack_size : 0x400;
-        PROVIDE(__stack_size = __stack_size);
-
         .text : {
-                KEEP(*(.text.init))
-                KEEP(*(.text.trap))
+                KEEP(*(.init))
                 *(.text)
-                *(.text.*)
-                . = ALIGN(8); 
-        } >rom AT>rom
+        }
 
         .data : ALIGN(8) {
+                __global_pointer$ = . + 0x800; 
+                *(.data.kernel)
                 *(.data)
                 *(.data.*)
-                *(.sdata)
-                *(.sdata.*)
-                *(.rodata .rodata.*)
-                *(.rdata .rdata.*)
-                . = ALIGN(8); 
-        } >ram AT>rom
+                *(.rodata)
+                *(.rodata.*)
+        }
 
-        PROVIDE(__global_pointer$ = ADDR(.data)); 
-        PROVIDE(_data_lma = LOADADDR(.data)); 
-        PROVIDE(_data = ADDR(.data)); 
-        PROVIDE(_edata = ADDR(.data) + SIZEOF(.data)); 
-
-        .bss : ALIGN(8) {
-                *(.bss)
-                *(.bss.*)
-                *(.sbss*)
-                *(COMMON)
-                . = ALIGN(8); 
-        } >ram AT>ram
-        PROVIDE(_bss = ADDR(.bss)); 
-        PROVIDE(_ebss = ADDR(.bss) + SIZEOF(.bss)); 
-
-        .stack ORIGIN(ram) + LENGTH(ram) - __stack_size : {
-            . += __stack_size;
-        } >ram AT>ram
-        PROVIDE(__stack_top = ADDR(.stack) + SIZEOF(.stack));
+        __stack_top = ORIGIN(RAM) + LENGTH(RAM);
 }

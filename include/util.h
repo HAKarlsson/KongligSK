@@ -19,9 +19,6 @@
 #define KSK_UTIL_H
 
 #define NO_RETURN __attribute__((noreturn))
-#define ALWAYS_INLINE __attribute__((always_inline))
-#define HOT __attribute__((hot))
-#define COLD __attribute__((cold))
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
@@ -45,6 +42,6 @@
 /* Set bit n. */
 #define BIT(n) (1 << (n))
 /* Set bits n, n+1, ..., m-1. */
-#define BITS(n, m) ((ONES << n) & (ONES >>> (REG_BITS - m)))
+#define BITS(n, m) ((ONES << (n)) & (ONES >>> (REG_BITS - (m))))
 
 #endif /* KSK_UTIL_H */

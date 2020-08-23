@@ -24,12 +24,11 @@
 .extern __stack_top
 .extern kernel
 
-.section .text.trap
 .align 4 
 /* TrapEntry(void) */
 .global TrapEntry
 TrapEntry:
-    /* Swap a0 with PCB pointer in MSCRATCH. */
+    /* Swap a0 with PCB pointer in mscratch. */
     csrrw   a0, mscratch, a0
     /* Save user context to PCB. */
     /* Save general purpose registers. */
@@ -76,29 +75,25 @@ TrapEntry:
     SREG    t1, PCB_PC(a0)
 
     /* Load kernel gp, sp, and fp (s0). */
-.option push
-.option norelax
+    .option push
+    .option norelax
     la      gp, __global_pointer$
-.option pop
-    
+    .option pop
     la      sp, __stack_top
     mv      s0, sp
+
     /* load pointer to kernel struct */
     la      a1, kernel
 
-    /* Set return address (ra) to trap_exit */
+    /* Set return address (ra) to TrapExit */
     la      ra, TrapExit
+    bgez    a2, exception 
 
-    /* 
-     * If mcause < 0 (e.g., mcause.msb == 1) 
-     * then
-     *   jump to handle_intrp(pcb, kernel, mcause)
-     * else
-     *   jump to handle_excpt(pcb, kernel, mcause, mtval)
-     */
-    bgez    a2, 1f
-    j       HandleInterrupt  
-1:  j       HandleException 
+interrupt:
+    tail    HandleInterrupt
+
+exception:
+    tail    HandleException
 
 /* TrapExit(pcb_t* pcb) */
 .global TrapExit 
@@ -141,4 +136,3 @@ TrapExit:
     LREG    a0, PCB_A0(a0)
     /* Return to user context. */
     mret
-.end

@@ -63,7 +63,7 @@
 #define PCB_PMPADDR5 (REG_BYTES * 39)
 #define PCB_PMPADDR6 (REG_BYTES * 40)
 #define PCB_PMPADDR7 (REG_BYTES * 41)
-#else
+#else /* RV64 */
 #define PCB_PMPCFG0 (REG_BYTES * 32)
 #define PCB_PMPADDR0 (REG_BYTES * 33)
 #define PCB_PMPADDR1 (REG_BYTES * 34)
