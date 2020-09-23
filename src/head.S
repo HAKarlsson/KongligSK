@@ -29,16 +29,14 @@ _start:
     csrwi   CSR_MIE, 0
     fence.i
 
-    /* load gp and sp */
+    /* load gp, sp and fp */
 .option push
 .option norelax
     la      gp, __global_pointer$
 .option pop
     la      sp, __stack_top
-    mv      s0, sp
+    mv      fp, sp
 
-/* initialize the kernel */
-    /* InitKernel(void) */
     call    InitKernel 
 
 hang:

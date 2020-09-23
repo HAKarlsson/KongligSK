@@ -52,6 +52,6 @@ static const IntrpHandler intrp_handlers[] = {
 
 Process *TrapHandler(Process *pcb, uintptr_t mcause, uintptr_t mtval) {
   if ((intptr_t)mcause < 0)
-    return intrp_handlers[0xFFF & mcause](pcb, mcause);
+    return intrp_handlers[~MSb & mcause](pcb, mcause);
   return excpt_handlers[mcause](pcb, mcause, mtval);
 }

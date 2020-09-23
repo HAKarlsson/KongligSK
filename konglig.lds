@@ -26,23 +26,27 @@ MEMORY
 
 SECTIONS
 {
+        PROVIDE (__stack_size = 0x100);
+
         .text : {
                 KEEP(*(.init))
                 *(.text)
         }
 
         .data : ALIGN(8) {
-                __global_pointer$ = . + 0x800; 
+                PROVIDE (__global_pointer$ = . + 0x800); 
                 *(.data)
                 *(.data.*)
                 *(.rodata)
                 *(.rodata.*)
         }
-
+        
         .bss : ALIGN(8) {
                 *(.bss)
                 *(.bss.*)
         }
-
-        __stack_top = ORIGIN(RAM) + LENGTH(RAM);
+        .stack : {
+          . = . + __stack_size;
+          PROVIDE (__stack_top = .);
+        }
 }

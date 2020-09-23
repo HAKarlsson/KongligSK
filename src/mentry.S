@@ -36,6 +36,7 @@
 TrapEntry:
     /* Save user a0, and load pointer to PCB. */
     csrrw   a0, mscratch, a0
+
     /* Save user context to PCB. */
     SREG    ra, PCB_RA(a0) 
     SREG    sp, PCB_SP(a0)  
@@ -43,11 +44,21 @@ TrapEntry:
     SREG    tp, PCB_TP(a0)  
     SREG    t0, PCB_T0(a0)  
     SREG    t1, PCB_T1(a0)  
+
+    /* Load user a0 and pc. */
+    csrr    t0, mscratch    
+    csrr    t1, mepc 
+
     SREG    t2, PCB_T2(a0)  
     SREG    s0, PCB_S0(a0)  
     SREG    s1, PCB_S1(a0)  
     SREG    a1, PCB_A1(a0)  
     SREG    a2, PCB_A2(a0)  
+
+    /* Load trap handling registers. */
+    csrr    a1, mcause 
+    csrr    a2, mtval 
+
     SREG    a3, PCB_A3(a0)  
     SREG    a4, PCB_A4(a0)  
     SREG    a5, PCB_A5(a0)  
@@ -68,23 +79,17 @@ TrapEntry:
     SREG    t5, PCB_T5(a0)  
     SREG    t6, PCB_T6(a0)  
 
-    /* Load and save user a0 and pc */
-    csrr    t0, mscratch    
-    csrr    t1, mepc 
+    /* Save user a0 and pc. */
     SREG    t0, PCB_A0(a0)
     SREG    t1, PCB_PC(a0)
 
-    /* Load trap handling registers */
-    csrr    a1, mcause 
-    csrr    a2, mtval 
-
-    /* Load kernel gp, sp, and fp (s0). */
+    /* Load kernel gp, sp, and fp. */
     .option push
     .option norelax
     la      gp, __global_pointer$
     .option pop
     la      sp, __stack_top
-    mv      s0, sp
+    mv      fp, sp 
 
     call    TrapHandler 
 
