@@ -5,8 +5,10 @@ KongligSK (~Royal Separation Kernel) is a separation kernel for RISC-V targeting
 
 ## Kernel goals
 
+Here we have the kernel's design goals.
+
 ### Formal verification 
-A separation kernel should be completely verified. We will verify it in two stages.
+A separation kernel should be completely verified. We consider two approaches to the verification.
 
 - We formally verify the C code with respect to a formal model of the kernel and the RISC-V specification. This allows us to compile the kernel with formally verified compiler [CompCert](https://github.com/AbsInt/CompCert), and get a fully formally verified kernel.
 
@@ -32,6 +34,16 @@ TBD.
 
 ## Installation
 TBD.
+
+## TODO
+
+1. Benchmark the kernel using gcc and compcert on HiFive1 rev. B. This will determine whether we should formally verify the kernel source code or binary. If the gcc version gives us a kernel with considerably better performance, we will verify the kernel binary.
+
+2. Write a pen and paper model and proof of the kernel.
+
+3. Create a formal model of the kernel in [HOL](https://hol-theorem-prover.org/).
+
+4. ???
 
 ## Related Projects 
 - [seL4](https://sel4.systems/) - A verified and secure µ-kernel.
