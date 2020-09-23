@@ -82,10 +82,10 @@ typedef struct process {
   uint64_t pmpcfg0;
   uintptr_t pmpaddr[8];
   uintptr_t trap_regs[8];
-  uintptr_t inbox;
+  uintptr_t id;
 } Process;
 
 extern Process processes[PROCESS_NUM];
-extern Inbox inboxes[INBOX_NUM][INBOX_NUM];
+extern Inbox inboxes[PROCESS_NUM][PROCESS_NUM];
 
 #endif /* KSK_KERNEL_H */

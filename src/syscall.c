@@ -34,7 +34,7 @@ Process *ksk_YieldTo(Process *proc) {
 }
 
 Process *ksk_Send(Process *proc) {
-  uintptr_t sender = proc->inbox;
+  uintptr_t sender = proc->id;
   uintptr_t receiver = proc->regs[A0];
   Inbox *inbox = &inboxes[receiver][sender];
   /* We must check receiver first, otherwise the inbox check is invalid! */
@@ -47,7 +47,7 @@ Process *ksk_Send(Process *proc) {
 
 Process *ksk_Recv(Process *proc) {
   uintptr_t sender = proc->regs[A0];
-  uintptr_t receiver = proc->inbox;
+  uintptr_t receiver = proc->id;
   Inbox *inbox = &inboxes[receiver][sender];
   /* We must check sender first, otherwise the inbox check is invalid! */
   if (sender >= PROCESS_NUM || !inbox->full) return proc;

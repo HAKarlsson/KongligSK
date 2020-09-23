@@ -17,4 +17,4 @@
  */
 #include "kernel.h"
 Process processes[PROCESS_NUM];
-Inbox inboxes[INBOX_NUM][INBOX_NUM];
+Inbox inboxes[PROCESS_NUM][PROCESS_NUM];
