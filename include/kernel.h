@@ -20,8 +20,6 @@
 #include "config.h"
 #include "util.h"
 
-#define MSGS_LEN SEL(4, 2)
-
 #define PC 0
 #define RA 1
 #define SP 2
@@ -64,6 +62,8 @@
 #define UTVAL 6
 #define UIP 7
 
+#define MSGS_LEN SEL(4, 2)
+
 typedef long intptr_t;
 typedef unsigned long uintptr_t;
 typedef int int32_t;
@@ -82,14 +82,10 @@ typedef struct process {
   uint64_t pmpcfg0;
   uintptr_t pmpaddr[8];
   uintptr_t trap_regs[8];
-  uintptr_t id;
+  uintptr_t inbox;
 } Process;
 
-typedef struct kernel {
-  Process processes[PROCESS_NUM];
-  Inbox inboxes[PROCESS_NUM][PROCESS_NUM];
-} Kernel;
-
-extern Kernel kernel;
+extern Process processes[PROCESS_NUM];
+extern Inbox inboxes[INBOX_NUM][INBOX_NUM];
 
 #endif /* KSK_KERNEL_H */

@@ -23,13 +23,12 @@
  * Delegate an exception to proc.
  * mcause and mtval holds the exception type and auxiliary information.
  */
-Process *HandleUserException(Process *proc, Kernel *kernel, uintptr_t mcause,
-                             uintptr_t mtval);
+Process *HandleUserException(Process *proc, uintptr_t mcause, uintptr_t mtval);
 
 /**
  * Delegate an interrupt to proc.
  * mcause holds the interrupt type.
  */
-Process *HandleUserInterrupt(Process *proc, Kernel *kernel, uintptr_t mcause);
+Process *HandleUserInterrupt(Process *proc, uintptr_t mcause);
 
 #endif /* KSK_USER_EXCPT_H */

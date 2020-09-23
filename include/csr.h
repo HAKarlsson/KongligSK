@@ -22,22 +22,22 @@
 #ifndef __ASSEMBLER__
 /*** CSR functions for C ***/
 /* Base instructions */
-#define CSRRW(rd, csr_num, rs)                                                 \
+#define CSRRW(rd, csr_num, rs) \
   __asm__("csrrw %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
 
-#define CSRRS(rd, csr_num, rs)                                                 \
+#define CSRRS(rd, csr_num, rs) \
   __asm__("csrrs %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
 
-#define CSRRC(rd, csr_num, rs)                                                 \
+#define CSRRC(rd, csr_num, rs) \
   __asm__("csrrc %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
 
-#define CSRRWI(rd, csr_num, imm)                                               \
+#define CSRRWI(rd, csr_num, imm) \
   __asm__("csrrwi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
 
-#define CSRRSI(rd, csr_num, imm)                                               \
+#define CSRRSI(rd, csr_num, imm) \
   __asm__("csrrsi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
 
-#define CSRRCI(rd, csr_num, imm)                                               \
+#define CSRRCI(rd, csr_num, imm) \
   __asm__("csrrci %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
 
 /* Pseudo CSR instructions */
@@ -49,13 +49,13 @@
 
 #define CSRC(csr_num, rs) __asm__("csrrs x0, %0, %1" ::"I"(csr_num), "r"(rs))
 
-#define CSRWI(csr_num, imm)                                                    \
+#define CSRWI(csr_num, imm) \
   __asm__("csrrwi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
-#define CSRSI(csr_num, imm)                                                    \
+#define CSRSI(csr_num, imm) \
   __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
-#define CSRCI(csr_num, imm)                                                    \
+#define CSRCI(csr_num, imm) \
   __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
 #endif /* __ASSEMBLER__ */
@@ -260,22 +260,32 @@
 #define CSR_MHPMEVENT31 0x33f
 
 /* CSR offsets */
-#define MCAUSE_INTERRUPT_BIT BIT(REG_BYTES - 1)
-
-#define MCAUSE_INSTRUCTION_ADDRESS_MISALIGNED 0
-#define MCAUSE_INSTRUCTION_ACCESS_FAULT 1
-#define MCAUSE_ILLEGAL_INSTRUCTION 2
-#define MCAUSE_BREAKPOINT 3
-#define MCAUSE_LOAD_ADDRESS_MISALIGNED 4
-#define MCAUSE_LOAD_ACCESS_FAULT 5
-#define MCAUSE_STORE_ADDRESS_MISALIGNED 6
-#define MCAUSE_STORE_ACCESS_FAULT 7
-#define MCAUSE_UMODE_ECALL 8
-#define MCAUSE_SMODE_ECALL 9
-#define MCAUSE_MMODE_ECALL 11
-#define MCAUSE_INSTRUCTION_PAGE_FAULT 12
-#define MCAUSE_LOAD_PAGE_FAULT 13
-#define MCAUSE_STORE_PAGE_FAULT 15
+/** MCAUSE **/
+/* exception codes */
+#define MCAUSE_EXCPT_INSTRUCTION_ADDRESS_MISALIGNED 0
+#define MCAUSE_EXCPT_INSTRUCTION_ACCESS_FAULT 1
+#define MCAUSE_EXCPT_ILLEGAL_INSTRUCTION 2
+#define MCAUSE_EXCPT_BREAKPOINT 3
+#define MCAUSE_EXCPT_LOAD_ADDRESS_MISALIGNED 4
+#define MCAUSE_EXCPT_LOAD_ACCESS_FAULT 5
+#define MCAUSE_EXCPT_STORE_ADDRESS_MISALIGNED 6
+#define MCAUSE_EXCPT_STORE_ACCESS_FAULT 7
+#define MCAUSE_EXCPT_USER_ECALL 8
+#define MCAUSE_EXCPT_SUPERVISOR_ECALL 9
+#define MCAUSE_EXCPT_MACHINE_ECALL 11
+#define MCAUSE_EXCPT_INSTRUCTION_PAGE_FAULT 12
+#define MCAUSE_EXCPT_LOAD_PAGE_FAULT 13
+#define MCAUSE_EXCPT_STORE_PAGE_FAULT 15
+/* interrupt codes */
+#define MCAUSE_INTRP_USER_SOFTWARE 0 
+#define MCAUSE_INTRP_USER_TIMER 4
+#define MCAUSE_INTRP_USER_EXTERN 8
+#define MCAUSE_INTRP_SUPERVISOR_SOFTWARE 1
+#define MCAUSE_INTRP_SUPERVISOR_TIMER 5
+#define MCAUSE_INTRP_SUPERVISOR_EXTERN 9
+#define MCAUSE_INTRP_MACHINE_SOFTWARE 3
+#define MCAUSE_INTRP_MACHINE_TIMER 7
+#define MCAUSE_INTRP_MACHINE_EXTERN 11
 
 /* User CSR registers */
 #define CSR_USTATUS 0x000

@@ -19,5 +19,6 @@
 #define KSK_CONFIG_H
 
 #define PROCESS_NUM 2
+#define INBOX_NUM 2
 
 #endif /* _CONFIG_H */

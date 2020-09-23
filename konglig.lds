@@ -33,11 +33,15 @@ SECTIONS
 
         .data : ALIGN(8) {
                 __global_pointer$ = . + 0x800; 
-                *(.data.kernel)
                 *(.data)
                 *(.data.*)
                 *(.rodata)
                 *(.rodata.*)
+        }
+
+        .bss : ALIGN(8) {
+                *(.bss)
+                *(.bss.*)
         }
 
         __stack_top = ORIGIN(RAM) + LENGTH(RAM);

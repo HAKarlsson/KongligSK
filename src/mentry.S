@@ -18,22 +18,25 @@
 #include "csr.h"
 #include "pcb_offset.h"
 
-.extern HandleException
-.extern HandleInterrupt
 .extern __global_pointer$
 .extern __stack_top
-.extern kernel
 
 .global TrapEntry
 .global TrapExit 
 
 .align 4 
-/* TrapEntry(void) */
+/** TrapEntry(void) 
+ * On a user-mode trap, we come to the trap entry.
+ * The trap entry must do the following:
+ * - Save user context to the PCB.
+ * - Load trap handling registers.
+ * - Load kernel registers.
+ * - Call the kernel body which handles the actual trap.
+ */
 TrapEntry:
-    /* Swap a0 with PCB pointer in mscratch. */
+    /* Save user a0, and load pointer to PCB. */
     csrrw   a0, mscratch, a0
     /* Save user context to PCB. */
-    /* Save general purpose registers. */
     SREG    ra, PCB_RA(a0) 
     SREG    sp, PCB_SP(a0)  
     SREG    gp, PCB_GP(a0)  
@@ -46,13 +49,6 @@ TrapEntry:
     SREG    a1, PCB_A1(a0)  
     SREG    a2, PCB_A2(a0)  
     SREG    a3, PCB_A3(a0)  
-
-    /* Read CSRs early because latency! */
-    csrr    t0, mscratch    
-    csrr    t1, mepc 
-    csrr    a2, mcause 
-    csrr    a3, mtval 
-
     SREG    a4, PCB_A4(a0)  
     SREG    a5, PCB_A5(a0)  
     SREG    a6, PCB_A6(a0)  
@@ -72,9 +68,15 @@ TrapEntry:
     SREG    t5, PCB_T5(a0)  
     SREG    t6, PCB_T6(a0)  
 
-    /* Save user a0 and pc.*/
+    /* Load and save user a0 and pc */
+    csrr    t0, mscratch    
+    csrr    t1, mepc 
     SREG    t0, PCB_A0(a0)
     SREG    t1, PCB_PC(a0)
+
+    /* Load trap handling registers */
+    csrr    a1, mcause 
+    csrr    a2, mtval 
 
     /* Load kernel gp, sp, and fp (s0). */
     .option push
@@ -84,27 +86,7 @@ TrapEntry:
     la      sp, __stack_top
     mv      s0, sp
 
-    /* pointer to current pcb to s1 */
-    mv      s1, a0
-
-    /* load pointer to kernel struct */
-    la      a1, kernel
-
-    /* Set return address (ra) to TrapExit */
-    bgez    a2, exception 
-
-interrupt:
-    call    HandleInterrupt
-    j       after_trap 
-
-exception:
-    call    HandleException
-
-after_trap:
-    /* TODO: Check machine timer interrupt in mip. */
-
-    /* If PCB is the same as before, skip PMP loading. */
-    beq     a0, s1, restore_context
+    call    TrapHandler 
 
 TrapExit:
     /* Load PMP settings from memory first. */
@@ -136,7 +118,6 @@ TrapExit:
     csrw    pmpaddr6, a6
     csrw    pmpaddr7, a7
 
-restore_context:
     /* We store a pointer to the PCB in MSCRATCH. */
     csrw    mscratch, a0
     /* Load user context from PCB. */

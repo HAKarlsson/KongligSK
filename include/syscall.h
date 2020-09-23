@@ -18,6 +18,5 @@
 #ifndef KSK_SYSCALL_H
 #define KSK_SYSCALL_H
 #include "kernel.h"
-Process *HandleSyscall(Process *proc, Kernel *kernel, uintptr_t mcause,
-                       uintptr_t mtval);
+Process *HandleSyscall(Process *proc, uintptr_t mcause, uintptr_t mtval);
 #endif /* KSK_SYSCALL_H */

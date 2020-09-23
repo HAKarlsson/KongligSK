@@ -20,4 +20,5 @@
 #include "kernel.h"
 void TrapEntry(void) NO_RETURN;
 void TrapExit(Process *proc) NO_RETURN;
+void TrapExitWithPMP(Process *proc) NO_RETURN;
 #endif /* KSK_ENTRY_H */

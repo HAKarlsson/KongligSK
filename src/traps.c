@@ -18,35 +18,40 @@
 #include "traps.h"
 
 #include "csr.h"
+#include "machine_timer.h"
 #include "syscall.h"
 #include "user_trap.h"
 #include "util.h"
 
-typedef Process *(*Handler)(Process *, Kernel *, uintptr_t, uintptr_t);
+typedef Process *(*ExcptHandler)(Process *pcb, uintptr_t mcause,
+                                 uintptr_t mtval);
+typedef Process *(*IntrpHandler)(Process *pcb, uintptr_t mcause);
 
-static const Handler exception_handlers[] = {
-    [MCAUSE_INSTRUCTION_ADDRESS_MISALIGNED] = HandleUserException,
-    [MCAUSE_INSTRUCTION_ACCESS_FAULT] = HandleUserException,
-    [MCAUSE_ILLEGAL_INSTRUCTION] = 0,
-    [MCAUSE_BREAKPOINT] = HandleUserException,
-    [MCAUSE_LOAD_ADDRESS_MISALIGNED] = HandleUserException,
-    [MCAUSE_LOAD_ACCESS_FAULT] = HandleUserException,
-    [MCAUSE_STORE_ADDRESS_MISALIGNED] = HandleUserException,
-    [MCAUSE_STORE_ACCESS_FAULT] = HandleUserException,
-    [MCAUSE_UMODE_ECALL] = HandleSyscall,
-    [MCAUSE_SMODE_ECALL] = 0,
-    [MCAUSE_MMODE_ECALL] = 0,
-    [MCAUSE_INSTRUCTION_PAGE_FAULT] = 0,
-    [MCAUSE_LOAD_PAGE_FAULT] = 0,
-    [MCAUSE_STORE_PAGE_FAULT] = 0,
+static const ExcptHandler excpt_handlers[] = {
+    [MCAUSE_EXCPT_INSTRUCTION_ADDRESS_MISALIGNED] = HandleUserException,
+    [MCAUSE_EXCPT_INSTRUCTION_ACCESS_FAULT] = HandleUserException,
+    [MCAUSE_EXCPT_ILLEGAL_INSTRUCTION] = 0,
+    [MCAUSE_EXCPT_BREAKPOINT] = HandleUserException,
+    [MCAUSE_EXCPT_LOAD_ADDRESS_MISALIGNED] = HandleUserException,
+    [MCAUSE_EXCPT_LOAD_ACCESS_FAULT] = HandleUserException,
+    [MCAUSE_EXCPT_STORE_ADDRESS_MISALIGNED] = HandleUserException,
+    [MCAUSE_EXCPT_STORE_ACCESS_FAULT] = HandleUserException,
+    [MCAUSE_EXCPT_USER_ECALL] = HandleSyscall,
+    [MCAUSE_EXCPT_SUPERVISOR_ECALL] = 0,
+    [MCAUSE_EXCPT_MACHINE_ECALL] = 0,
+    [MCAUSE_EXCPT_INSTRUCTION_PAGE_FAULT] = 0,
+    [MCAUSE_EXCPT_LOAD_PAGE_FAULT] = 0,
+    [MCAUSE_EXCPT_STORE_PAGE_FAULT] = 0,
 };
 
-Process *HandleException(Process *pcb, Kernel *kernel, uintptr_t mcause,
-                         uintptr_t mtval) {
-  return exception_handlers[mcause](pcb, kernel, mcause, mtval);
-}
+static const IntrpHandler intrp_handlers[] = {
+    [MCAUSE_INTRP_MACHINE_SOFTWARE] = 0,
+    [MCAUSE_INTRP_MACHINE_TIMER] = HandleMachineTimer,
+    [MCAUSE_INTRP_MACHINE_EXTERN] = 0,
+};
 
-Process *HandleInterrupt(Process *pcb, Kernel *kernel, uintptr_t mcause,
-                         uintptr_t mtval) {
-  return pcb;
+Process *TrapHandler(Process *pcb, uintptr_t mcause, uintptr_t mtval) {
+  if ((intptr_t)mcause < 0)
+    return intrp_handlers[0xFFF & mcause](pcb, mcause);
+  return excpt_handlers[mcause](pcb, mcause, mtval);
 }

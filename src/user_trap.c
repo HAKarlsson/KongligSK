@@ -17,8 +17,7 @@
  */
 #include "user_trap.h"
 
-Process *HandleUserException(Process *proc, Kernel *kernel, uintptr_t mcause,
-                             uintptr_t mtval) {
+Process *HandleUserException(Process *proc, uintptr_t mcause, uintptr_t mtval) {
   /* Save user pc. */
   proc->trap_regs[UEPC] = proc->regs[PC];
   /* Save trap information. */

@@ -15,6 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "kernel.h"
-Process processes[PROCESS_NUM];
-Inbox inboxes[INBOX_NUM][INBOX_NUM];
+#include "machine_timer.h"
+
+Process *HandleMachineTimer(Process *proc, uintptr_t mcause) { return proc; }
