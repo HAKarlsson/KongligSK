@@ -26,7 +26,7 @@
 typedef Process *(*Handler)(Process *);
 
 Process *ksk_YieldTo(Process *proc) {
-  uintptr_t target = proc->regs[A0];
+  uintptr_t target = proc->regs.a0;
   /* If the target process is invalid, just return the current process. */
   if (target >= PROCESS_NUM) return proc;
   /* Return the target process. */
@@ -35,24 +35,34 @@ Process *ksk_YieldTo(Process *proc) {
 
 Process *ksk_Send(Process *proc) {
   uintptr_t sender = proc->id;
-  uintptr_t receiver = proc->regs[A0];
+  uintptr_t receiver = proc->regs.a0;
   Inbox *inbox = &inboxes[receiver][sender];
   /* We must check receiver first, otherwise the inbox check is invalid! */
   if (receiver >= PROCESS_NUM || inbox->full) return proc;
-  /* Copy the message from register to inbox, then mark inbox as full. */
-  for (int i = 0; i < MSGS_LEN; ++i) inbox->msgs[i] = proc->regs[A2 + i];
+  /* Copy the message from regs.ster to inbox, then mark inbox as full. */
+  inbox->msgs[0] = proc->regs.a2;
+  inbox->msgs[1] = proc->regs.a3;
+#ifdef RV32
+  inbox->msgs[2] = proc->regs.a4;
+  inbox->msgs[3] = proc->regs.a5;
+#endif
   inbox->full = 1;
   return proc;
 }
 
 Process *ksk_Recv(Process *proc) {
-  uintptr_t sender = proc->regs[A0];
+  uintptr_t sender = proc->regs.a0;
   uintptr_t receiver = proc->id;
   Inbox *inbox = &inboxes[receiver][sender];
   /* We must check sender first, otherwise the inbox check is invalid! */
   if (sender >= PROCESS_NUM || !inbox->full) return proc;
-  /* Copy the message from inbox to register, then mark inbox as empty. */
-  for (int i = 0; i < MSGS_LEN; ++i) proc->regs[A2 + i] = inbox->msgs[i];
+  /* Copy the message from inbox to regs.ster, then mark inbox as empty. */
+  proc->regs.a2 = inbox->msgs[0];
+  proc->regs.a3 = inbox->msgs[1];
+#ifdef RV32
+  proc->regs.a4 = inbox->msgs[2];
+  proc->regs.a5 = inbox->msgs[3];
+#endif
   inbox->full = 0;
   return proc;
 }
@@ -64,9 +74,9 @@ static const Handler syscall_handlers[] = {
 };
 
 Process *HandleSyscall(Process *proc, uintptr_t mcause, uintptr_t mtval) {
-  uintptr_t syscall_number = proc->regs[T0];
+  uintptr_t syscall_number = proc->regs.t0;
   if (syscall_number < ARRAY_SIZE(syscall_handlers)) {
-    proc->regs[PC] += 4;
+    proc->regs.pc += 4;
     return syscall_handlers[syscall_number](proc);
   }
   return HandleUserException(proc, MCAUSE_EXCPT_ILLEGAL_INSTRUCTION,

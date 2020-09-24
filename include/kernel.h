@@ -17,71 +17,82 @@
  */
 #ifndef KSK_KERNEL_H
 #define KSK_KERNEL_H
+#include <stdint.h>
+
 #include "config.h"
 #include "util.h"
 
-#define PC 0
-#define RA 1
-#define SP 2
-#define GP 3
-#define TP 4
-#define T0 5
-#define T1 6
-#define T2 7
-#define S0 8
-#define S1 9
-#define A0 10
-#define A1 11
-#define A2 12
-#define A3 13
-#define A4 14
-#define A5 15
-#define A6 16
-#define A7 17
-#define S2 18
-#define S3 19
-#define S4 20
-#define S5 21
-#define S6 22
-#define S7 23
-#define S8 24
-#define S9 25
-#define S10 26
-#define S11 27
-#define T3 28
-#define T4 29
-#define T5 30
-#define T6 31
-
-#define USTATUS 0
-#define UIE 1
-#define UTVEC 2
-#define USCRATCH 3
-#define UEPC 4
-#define UCAUSE 5
-#define UTVAL 6
-#define UIP 7
-
-#define MSGS_LEN SEL(4, 2)
-
-typedef long intptr_t;
-typedef unsigned long uintptr_t;
-typedef int int32_t;
-typedef unsigned int uint32_t;
-typedef long long int64_t;
-typedef unsigned long long uint64_t;
-
 typedef struct inbox {
   uintptr_t full;
-  uintptr_t msgs[MSGS_LEN];
+  uintptr_t msgs[SEL(4,2)];
 } Inbox;
+
+typedef struct regs {
+  uintptr_t pc;
+  uintptr_t ra;
+  uintptr_t sp;
+  uintptr_t gp;
+  uintptr_t tp;
+  uintptr_t t0;
+  uintptr_t t1;
+  uintptr_t t2;
+  uintptr_t s0;
+  uintptr_t s1;
+  uintptr_t a0;
+  uintptr_t a1;
+  uintptr_t a2;
+  uintptr_t a3;
+  uintptr_t a4;
+  uintptr_t a5;
+  uintptr_t a6;
+  uintptr_t a7;
+  uintptr_t s2;
+  uintptr_t s3;
+  uintptr_t s4;
+  uintptr_t s5;
+  uintptr_t s6;
+  uintptr_t s7;
+  uintptr_t s8;
+  uintptr_t s9;
+  uintptr_t s10;
+  uintptr_t s11;
+  uintptr_t t3;
+  uintptr_t t4;
+  uintptr_t t5;
+  uintptr_t t6;
+} regs_t;
+
+typedef struct ut_regs {
+  uintptr_t ustatus;
+  uintptr_t uie;
+  uintptr_t utvec;
+  uintptr_t uscratch;
+  uintptr_t uepc;
+  uintptr_t ucause;
+  uintptr_t utval;
+  uintptr_t uip;
+} ut_regs_t;
+
+typedef struct pmp {
+  uintptr_t pmpcfg0;
+#ifdef RV32
+  uintptr_t pmpcfg1;
+#endif
+  uintptr_t pmpaddr0;
+  uintptr_t pmpaddr1;
+  uintptr_t pmpaddr2;
+  uintptr_t pmpaddr3;
+  uintptr_t pmpaddr4;
+  uintptr_t pmpaddr5;
+  uintptr_t pmpaddr6;
+  uintptr_t pmpaddr7;
+} pmp_t;
 
 /* PCB of a user-mode process. */
 typedef struct process {
-  uintptr_t regs[32];
-  uint64_t pmpcfg0;
-  uintptr_t pmpaddr[8];
-  uintptr_t trap_regs[8];
+  regs_t regs;
+  pmp_t pmp;
+  ut_regs_t ut_regs;
   uintptr_t id;
 } Process;
 

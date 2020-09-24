@@ -19,13 +19,13 @@
 
 Process *HandleUserException(Process *proc, uintptr_t mcause, uintptr_t mtval) {
   /* Save user pc. */
-  proc->trap_regs[UEPC] = proc->regs[PC];
+  proc->ut_regs.uepc = proc->regs.pc;
   /* Save trap information. */
-  proc->trap_regs[UCAUSE] = mcause;
-  proc->trap_regs[UTVAL] = mtval;
+  proc->ut_regs.ucause = mcause;
+  proc->ut_regs.utval = mtval;
   /* Disable interrupts and set UPIE if UIE */
-  proc->trap_regs[USTATUS] = (proc->trap_regs[USTATUS] & 1) << 4;
+  proc->ut_regs.ustatus = (proc->ut_regs.ustatus & 1) << 4;
   /* User jumps to trap handler. */
-  proc->regs[PC] = proc->trap_regs[UTVEC] & ~3UL;
+  proc->regs.pc = proc->ut_regs.utvec & ~3UL;
   return proc;
 }
