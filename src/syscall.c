@@ -45,6 +45,7 @@ Process* ksk_Send(Process* proc)
     Inbox* inbox = &inboxes[receiver][sender];
     /* We must check receiver first, otherwise the inbox check is invalid! */
     if (receiver >= NR_PROCS || inbox->full) {
+	// maybe do exception for bad receiver??
         proc->regs.a0 = -1;
         return proc;
     }
@@ -52,7 +53,6 @@ Process* ksk_Send(Process* proc)
     inbox->msgs[0] = proc->regs.a2;
     inbox->msgs[1] = proc->regs.a3;
     inbox->full = 1;
-    proc->regs.a0 = receiver;
     return proc;
 }
 
@@ -63,6 +63,7 @@ Process* ksk_Recv(Process* proc)
     Inbox* inbox = &inboxes[receiver][sender];
     /* We must check sender first, otherwise the inbox check is invalid! */
     if (sender >= NR_PROCS || !inbox->full) {
+	// maybe do exception for bad sender??
         proc->regs.a0 = -1;
         return proc;
     }
@@ -70,7 +71,6 @@ Process* ksk_Recv(Process* proc)
     proc->regs.a2 = inbox->msgs[0];
     proc->regs.a3 = inbox->msgs[1];
     inbox->full = 0;
-    proc->regs.a0 = sender;
     return proc;
 }
 
