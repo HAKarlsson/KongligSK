@@ -23,9 +23,10 @@
 #include "user_trap.h"
 #include "util.h"
 
-typedef Process *(*ExcptHandler)(Process *pcb, uintptr_t mcause,
-                                 uintptr_t mtval);
-typedef Process *(*IntrpHandler)(Process *pcb, uintptr_t mcause);
+typedef Process* (*ExcptHandler)(Process* pcb,
+    uintptr_t mcause,
+    uintptr_t mtval);
+typedef Process* (*IntrpHandler)(Process* pcb, uintptr_t mcause);
 
 static const ExcptHandler excpt_handlers[] = {
     [MCAUSE_EXCPT_INSTRUCTION_ADDRESS_MISALIGNED] = HandleUserException,
@@ -50,8 +51,9 @@ static const IntrpHandler intrp_handlers[] = {
     [MCAUSE_INTRP_MACHINE_EXTERN] = 0,
 };
 
-Process *TrapHandler(Process *pcb, uintptr_t mcause, uintptr_t mtval) {
-  if ((intptr_t)mcause < 0)
-    return intrp_handlers[~MSb & mcause](pcb, mcause);
-  return excpt_handlers[mcause](pcb, mcause, mtval);
+Process* TrapHandler(Process* pcb, uintptr_t mcause, uintptr_t mtval)
+{
+    if ((intptr_t)mcause < 0)
+        return intrp_handlers[~MSb & mcause](pcb, mcause);
+    return excpt_handlers[mcause](pcb, mcause, mtval);
 }

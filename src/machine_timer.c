@@ -17,4 +17,7 @@
  */
 #include "machine_timer.h"
 
-Process *HandleMachineTimer(Process *proc, uintptr_t mcause) { return proc; }
+Process* HandleMachineTimer(Process* proc, uintptr_t mcause)
+{
+    return proc;
+}

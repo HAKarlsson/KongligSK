@@ -23,10 +23,10 @@
  * Handles an exception for the proc, using mcause to determine the
  * exception type. mtval is the auxiliary information for the trap.
  */
-Process *TrapHandler(Process *proc, uintptr_t mcause, uintptr_t mtval);
+Process* TrapHandler(Process* proc, uintptr_t mcause, uintptr_t mtval);
 
 void TrapEntry(void) NO_RETURN;
-void TrapExit(Process *proc) NO_RETURN;
-void TrapExitWithPMP(Process *proc) NO_RETURN;
+void TrapExit(Process* proc) NO_RETURN;
+void TrapExitWithPMP(Process* proc) NO_RETURN;
 
 #endif /* KSK_TRAPS_H */

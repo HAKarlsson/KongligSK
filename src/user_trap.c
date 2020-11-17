@@ -17,15 +17,16 @@
  */
 #include "user_trap.h"
 
-Process *HandleUserException(Process *proc, uintptr_t mcause, uintptr_t mtval) {
-  /* Save user pc. */
-  proc->ut_regs.uepc = proc->regs.pc;
-  /* Save trap information. */
-  proc->ut_regs.ucause = mcause;
-  proc->ut_regs.utval = mtval;
-  /* Disable interrupts and set UPIE if UIE */
-  proc->ut_regs.ustatus = (proc->ut_regs.ustatus & 1) << 4;
-  /* User jumps to trap handler. */
-  proc->regs.pc = proc->ut_regs.utvec & ~3UL;
-  return proc;
+Process* HandleUserException(Process* proc, uintptr_t mcause, uintptr_t mtval)
+{
+    /* Save user pc. */
+    proc->ut_regs.uepc = proc->regs.pc;
+    /* Save trap information. */
+    proc->ut_regs.ucause = mcause;
+    proc->ut_regs.utval = mtval;
+    /* Disable interrupts and set UPIE if UIE */
+    proc->ut_regs.ustatus = (proc->ut_regs.ustatus & 1) << 4;
+    /* User jumps to trap handler. */
+    proc->regs.pc = proc->ut_regs.utvec & ~3UL;
+    return proc;
 }

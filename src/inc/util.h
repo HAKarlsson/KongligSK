@@ -22,11 +22,11 @@
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
-#define REG_BYTES   8
-#define REG_BITS    64
+#define REG_BYTES 8
+#define REG_BITS 64
 
 #define ONES 0xFFFFFFFFFFFFFFFFUL
-#define MSb  0x8000000000000000UL
+#define MSb 0x8000000000000000UL
 
 /* Set bit n. */
 #define BIT(n) (1 << (n))

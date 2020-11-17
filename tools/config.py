@@ -38,8 +38,8 @@ def print_defs(defs):
 if __name__ == "__main__":
     args = get_arguments()
     conf = parse_yaml(args.config)
-    print("#ifndef _CONFIG_H")
-    print("#define _CONFIG_H")
+    print("#ifndef KSK_CONFIG_H")
+    print("#define KSK_CONFIG_H")
     conf["DEFINES"]["NR_PROCS"] = len(conf["PROCESSES"])
     print_defs(conf["DEFINES"])
-    print("#endif /* _CONFIG_H */")
+    print("#endif /* KSK_CONFIG_H */")

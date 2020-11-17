@@ -23,25 +23,39 @@
 /*** CSR functions for C ***/
 /* Base instructions */
 #define CSRRW(rd, csr_num, rs) \
-  __asm__("csrrw %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
+    __asm__("csrrw %0, %1, %2" \
+            : "=r"(rd)         \
+            : "I"(csr_num), "r"(rs))
 
 #define CSRRS(rd, csr_num, rs) \
-  __asm__("csrrs %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
+    __asm__("csrrs %0, %1, %2" \
+            : "=r"(rd)         \
+            : "I"(csr_num), "r"(rs))
 
 #define CSRRC(rd, csr_num, rs) \
-  __asm__("csrrc %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
+    __asm__("csrrc %0, %1, %2" \
+            : "=r"(rd)         \
+            : "I"(csr_num), "r"(rs))
 
 #define CSRRWI(rd, csr_num, imm) \
-  __asm__("csrrwi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
+    __asm__("csrrwi %0, %1, %2"  \
+            : "=r"(rd)           \
+            : "I"(csr_num), "I"(imm))
 
 #define CSRRSI(rd, csr_num, imm) \
-  __asm__("csrrsi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
+    __asm__("csrrsi %0, %1, %2"  \
+            : "=r"(rd)           \
+            : "I"(csr_num), "I"(imm))
 
 #define CSRRCI(rd, csr_num, imm) \
-  __asm__("csrrci %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
+    __asm__("csrrci %0, %1, %2"  \
+            : "=r"(rd)           \
+            : "I"(csr_num), "I"(imm))
 
 /* Pseudo CSR instructions */
-#define CSRR(rd, csr_num) __asm__("csrrs %0, %1, x0" : "=r"(rd) : "I"(csr_num))
+#define CSRR(rd, csr_num) __asm__("csrrs %0, %1, x0" \
+                                  : "=r"(rd)         \
+                                  : "I"(csr_num))
 
 #define CSRW(csr_num, rs) __asm__("csrrw x0, %0, %1" ::"I"(csr_num), "r"(rs))
 
@@ -50,13 +64,13 @@
 #define CSRC(csr_num, rs) __asm__("csrrs x0, %0, %1" ::"I"(csr_num), "r"(rs))
 
 #define CSRWI(csr_num, imm) \
-  __asm__("csrrwi x0, %0, %1" ::"I"(csr_num), "I"(imm))
+    __asm__("csrrwi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
 #define CSRSI(csr_num, imm) \
-  __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
+    __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
 #define CSRCI(csr_num, imm) \
-  __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
+    __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
 #endif /* __ASSEMBLER__ */
 
@@ -277,7 +291,7 @@
 #define MCAUSE_EXCPT_LOAD_PAGE_FAULT 13
 #define MCAUSE_EXCPT_STORE_PAGE_FAULT 15
 /* interrupt codes */
-#define MCAUSE_INTRP_USER_SOFTWARE 0 
+#define MCAUSE_INTRP_USER_SOFTWARE 0
 #define MCAUSE_INTRP_USER_TIMER 4
 #define MCAUSE_INTRP_USER_EXTERN 8
 #define MCAUSE_INTRP_SUPERVISOR_SOFTWARE 1
