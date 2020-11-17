@@ -10,8 +10,11 @@ RISCV_PREFIX?=riscv64-unknown-elf-
 SRC_DIR	= src
 HDR_DIR = src/inc
 
-ELF?=$(BUILD_DIR)/konglig.elf
-LDS?=konglig.lds
+ELF	?= $(BUILD_DIR)/konglig.elf
+LDS	?= konglig.lds
+CONFIG	?= example_config.yaml
+
+CONFIG_HDR=$(HDR_DIR)/config.h
 
 # Source files, C and assembly
 C_SRCS	= $(wildcard $(SRC_DIR)/*.c) 
@@ -49,7 +52,7 @@ all: $(BUILD_DIR) $(ELF) $(DAS)
 
 .PHONY: clean
 clean: 
-	@rm -rf $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR) $(CONFIG_HDR)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -66,5 +69,8 @@ $(BUILD_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDR_DIR)
 %.da: %.elf
 	$(OBJDUMP) -d $< > $@
 
-$(ELF): $(OBJS) $(LDS)
+$(CONFIG_HDR): $(CONFIG)
+	tools/config.py $(CONFIG) > $(CONFIG_HDR)
+
+$(ELF): $(CONFIG_HDR) $(OBJS)  $(LDS)
 	$(LD) $(LDFLAGS) $(OBJS) -o $@

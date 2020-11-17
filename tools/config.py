@@ -21,7 +21,6 @@ import yaml
 def get_arguments():
     parser = argparse.ArgumentParser(description='Generate KongligSK code from configuration file.')
     parser.add_argument('config', help='Path to configuration file (YAML).')
-    parser.add_argument('inc', help='Path to header directory.')
     return parser.parse_args()
 
 def parse_yaml(filename):
@@ -30,19 +29,17 @@ def parse_yaml(filename):
     return data
 
 
-def dict2cstruct(struct_dict):
+def print_defs(defs):
+    for name, val in defs.items():
+        print(f"#define {name:20} {val}")
 
-
-
-
-class ConfigParser:
-    def __init__(self, conf):
-        self.defines = conf['DEFINES']
-        self.defines['NR_PROCS'] = len(conf['PROCESSES'])
 
 
 if __name__ == "__main__":
     args = get_arguments()
     conf = parse_yaml(args.config)
-    parser = ConfigParser(conf)
-    print(parser.defines)
+    print("#ifndef _CONFIG_H")
+    print("#define _CONFIG_H")
+    conf["DEFINES"]["NR_PROCS"] = len(conf["PROCESSES"])
+    print_defs(conf["DEFINES"])
+    print("#endif /* _CONFIG_H */")
