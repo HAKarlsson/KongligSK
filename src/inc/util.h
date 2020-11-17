@@ -15,14 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "csr.h"
-#include "kernel.h"
-#include "mentry.h"
+#ifndef KSK_UTIL_H
+#define KSK_UTIL_H
 
-void InitCPU(void) { /* Set CPU frequency and so on. */
-}
+#define NO_RETURN __attribute__((noreturn))
 
-void InitKernel(void) {
-  CSRWI(CSR_MSTATUS, 0);
-  CSRW(CSR_MTVEC, TrapEntry);
-}
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+
+#define REG_BYTES   8
+#define REG_BITS    64
+
+#define ONES 0xFFFFFFFFFFFFFFFFUL
+#define MSb  0x8000000000000000UL
+
+/* Set bit n. */
+#define BIT(n) (1 << (n))
+/* Set bits n, n+1, ..., m-1. */
+#define BITS(n, m) ((ONES << (n)) & (ONES >>> (REG_BITS - (m))))
+
+#endif /* KSK_UTIL_H */

@@ -15,9 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef KSK_CONFIG_H
-#define KSK_CONFIG_H
+#ifndef KSK_TRAPS_H
+#define KSK_TRAPS_H
+#include "kernel.h"
 
-#define PROCESS_NUM 2
+/**
+ * Handles an exception for the proc, using mcause to determine the
+ * exception type. mtval is the auxiliary information for the trap.
+ */
+Process *TrapHandler(Process *proc, uintptr_t mcause, uintptr_t mtval);
 
-#endif /* _CONFIG_H */
+void TrapEntry(void) NO_RETURN;
+void TrapExit(Process *proc) NO_RETURN;
+void TrapExitWithPMP(Process *proc) NO_RETURN;
+
+#endif /* KSK_TRAPS_H */

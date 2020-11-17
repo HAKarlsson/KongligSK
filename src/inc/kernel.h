@@ -24,7 +24,7 @@
 
 typedef struct inbox {
   uintptr_t full;
-  uintptr_t msgs[SEL(4,2)];
+  uintptr_t msgs[2];
 } Inbox;
 
 typedef struct regs {
@@ -75,9 +75,7 @@ typedef struct ut_regs {
 
 typedef struct pmp {
   uintptr_t pmpcfg0;
-#ifdef RV32
   uintptr_t pmpcfg1;
-#endif
   uintptr_t pmpaddr0;
   uintptr_t pmpaddr1;
   uintptr_t pmpaddr2;
@@ -96,7 +94,7 @@ typedef struct process {
   uintptr_t id;
 } Process;
 
-extern Process processes[PROCESS_NUM];
-extern Inbox inboxes[PROCESS_NUM][PROCESS_NUM];
+extern Process processes[NR_PROCS];
+extern Inbox inboxes[NR_PROCS][NR_PROCS];
 
 #endif /* KSK_KERNEL_H */

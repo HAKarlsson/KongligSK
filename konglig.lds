@@ -19,34 +19,32 @@ OUTPUT_ARCH("riscv")
 
 ENTRY(_start)
 
-MEMORY
-{
-        RAM (rwx) : ORIGIN = 0x80000000, LENGTH = 0x1000
+MEMORY {
+    RAM (rwx) : ORIGIN = 0x80000000, LENGTH = 0x1000
 }
 
-SECTIONS
-{
-        PROVIDE (__stack_size = 0x100);
+SECTIONS {
+    PROVIDE (__stack_size = 0x100);
 
-        .text : {
-                KEEP(*(.init))
-                *(.text)
-        }
+    .text : {
+        KEEP(*(.init))
+        *(.text)
+    }
 
-        .data : ALIGN(8) {
-                PROVIDE (__global_pointer$ = . + 0x800); 
-                *(.data)
-                *(.data.*)
-                *(.rodata)
-                *(.rodata.*)
-        }
-        
-        .bss : ALIGN(8) {
-                *(.bss)
-                *(.bss.*)
-        }
-        .stack : {
-          . = . + __stack_size;
-          PROVIDE (__stack_top = .);
-        }
+    .data : ALIGN(8) {
+        PROVIDE (__global_pointer$ = . + 0x800); 
+        *(.data)
+        *(.data.*)
+        *(.rodata)
+        *(.rodata.*)
+    }
+
+    .bss : ALIGN(8) {
+        *(.bss)
+        *(.bss.*)
+    }
+    .stack : {
+        . = . + __stack_size;
+        PROVIDE (__stack_top = .);
+    }
 }

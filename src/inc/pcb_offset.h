@@ -52,18 +52,6 @@
 #define PCB_T5 (REG_BYTES * 30)
 #define PCB_T6 (REG_BYTES * 31)
 
-#ifdef RV32
-#define PCB_PMPCFG0 (REG_BYTES * 32)
-#define PCB_PMPCFG1 (REG_BYTES * 33)
-#define PCB_PMPADDR0 (REG_BYTES * 34)
-#define PCB_PMPADDR1 (REG_BYTES * 35)
-#define PCB_PMPADDR2 (REG_BYTES * 36)
-#define PCB_PMPADDR3 (REG_BYTES * 37)
-#define PCB_PMPADDR4 (REG_BYTES * 38)
-#define PCB_PMPADDR5 (REG_BYTES * 39)
-#define PCB_PMPADDR6 (REG_BYTES * 40)
-#define PCB_PMPADDR7 (REG_BYTES * 41)
-#else /* RV64 */
 #define PCB_PMPCFG0 (REG_BYTES * 32)
 #define PCB_PMPADDR0 (REG_BYTES * 33)
 #define PCB_PMPADDR1 (REG_BYTES * 34)
@@ -73,6 +61,5 @@
 #define PCB_PMPADDR5 (REG_BYTES * 38)
 #define PCB_PMPADDR6 (REG_BYTES * 39)
 #define PCB_PMPADDR7 (REG_BYTES * 40)
-#endif
 
 #endif /* KSK_REG_OFFSET_H */

@@ -15,6 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include "csr.h"
 #include "kernel.h"
-Process processes[PROCESS_NUM];
-Inbox inboxes[PROCESS_NUM][PROCESS_NUM];
+#include "traps.h"
+Process processes[NR_PROCS];// = CONFIG_PROC;
+Inbox inboxes[NR_PROCS][NR_PROCS];
+
+void InitCPU(void) { /* Set CPU frequency and so on. */
+}
+
+void InitKernel(void) {
+  CSRWI(CSR_MSTATUS, 0);
+  CSRW(CSR_MTVEC, TrapEntry);
+}

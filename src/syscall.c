@@ -28,7 +28,7 @@ typedef Process *(*Handler)(Process *);
 Process *ksk_YieldTo(Process *proc) {
   uintptr_t target = proc->regs.a0;
   /* If the target process is invalid, just return the current process. */
-  if (target >= PROCESS_NUM) return proc;
+  if (target >= NR_PROCS) return proc;
   /* Return the target process. */
   return &processes[target];
 }
@@ -38,14 +38,10 @@ Process *ksk_Send(Process *proc) {
   uintptr_t receiver = proc->regs.a0;
   Inbox *inbox = &inboxes[receiver][sender];
   /* We must check receiver first, otherwise the inbox check is invalid! */
-  if (receiver >= PROCESS_NUM || inbox->full) return proc;
+  if (receiver >= NR_PROCS || inbox->full) return proc;
   /* Copy the message from regs.ster to inbox, then mark inbox as full. */
   inbox->msgs[0] = proc->regs.a2;
   inbox->msgs[1] = proc->regs.a3;
-#ifdef RV32
-  inbox->msgs[2] = proc->regs.a4;
-  inbox->msgs[3] = proc->regs.a5;
-#endif
   inbox->full = 1;
   return proc;
 }
@@ -55,14 +51,10 @@ Process *ksk_Recv(Process *proc) {
   uintptr_t receiver = proc->id;
   Inbox *inbox = &inboxes[receiver][sender];
   /* We must check sender first, otherwise the inbox check is invalid! */
-  if (sender >= PROCESS_NUM || !inbox->full) return proc;
+  if (sender >= NR_PROCS || !inbox->full) return proc;
   /* Copy the message from inbox to regs.ster, then mark inbox as empty. */
   proc->regs.a2 = inbox->msgs[0];
   proc->regs.a3 = inbox->msgs[1];
-#ifdef RV32
-  proc->regs.a4 = inbox->msgs[2];
-  proc->regs.a5 = inbox->msgs[3];
-#endif
   inbox->full = 0;
   return proc;
 }

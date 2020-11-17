@@ -1,83 +1,70 @@
-# This file is part of KongligSK.
-# Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
-# 
-# KongligSK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# 
-# KongligSK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
+# Configuration files
+CONFIG_FILE?=example_config.yaml
+# Build directory
+BUILD_DIR?=build
+# RISC-V Toolchain prefix
+RISCV_PREFIX?=riscv64-unknown-elf-
 
-# Tools
-CC = riscv64-unknown-elf-gcc
-#CC = clang --target=riscv64 /* produces larger code :/ */
-OBJDUMP = riscv64-unknown-elf-objdump
-SIZE = riscv64-unknown-elf-size
-LD = riscv64-unknown-elf-ld
 
-BUILDDIR ?= konglig_build
+# Source and header directories
+SRC_DIR	= src
+HDR_DIR = src/inc
 
-SRCDIR    = src
-HDRDIR    = include
-ELF       = $(BUILDDIR)/konglig.elf
-C_SOURCE  = $(wildcard $(SRCDIR)/*.c)
-S_SOURCE  = $(wildcard $(SRCDIR)/*.S)
-C_OBJECTS = $(patsubst $(SRCDIR)/%.c, $(BUILDDIR)/%.o, $(C_SOURCE))
-S_OBJECTS = $(patsubst $(SRCDIR)/%.S, $(BUILDDIR)/%.o, $(S_SOURCE))
-HEADERS   = $(wildcard $(HDRDIR)/*.h)
-	    
+ELF?=$(BUILD_DIR)/konglig.elf
+LDS?=konglig.lds
 
-### C flags ###
-C_FLAGS += -std=c99 
-C_FLAGS += -mabi=lp64 -march=rv64imac -mcmodel=medany
-C_FLAGS += -Iinclude
-C_FLAGS += -Wall -Wextra -Wno-unused-parameter
-C_FLAGS += -O2 -g
+# Source files, C and assembly
+C_SRCS	= $(wildcard $(SRC_DIR)/*.c) 
+S_SRCS	= $(wildcard $(SRC_DIR)/*.S)
+# Object files
+C_OBJS	= $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%.o, $(C_SRCS))
+S_OBJS	= $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%.o, $(S_SRCS))
+OBJS    = $(C_OBJS) $(S_OBJS)
+# Disassembly files (objdump)
+DAS	= $(patsubst %.o, %.da, $(OBJS)) \
+	  $(patsubst %.elf, %.da, $(ELF)) \
 
-### Assembly flags ###
-# __ASSEMBLER__ is already defined for GCC, 
-# but maybe not other compilers.
-S_FLAGS += -D__ASSEMBLER__
-S_FLAGS += -mabi=lp64 -march=rv64imac -mcmodel=medany
-S_FLAGS += -Iinclude
-S_FLAGS += -O2 -g
+# Toolchain
+CC	= $(RISCV_PREFIX)gcc
+LD	= $(RISCV_PREFIX)ld
+OBJDUMP	= $(RISCV_PREFIX)objdump
 
-### Linker flags ###
-LD_FLAGS += -nostdlib
-LD_FLAGS += -T konglig.lds
+# C (gcc) flags
+CFLAGS	= -I$(HDR_DIR)
+CFLAGS	+= -mabi=lp64 -march=rv64imac -mcmodel=medany
+CFLAGS	+= -Wall -Wextra -Wno-unused-parameter
+CFLAGS	+= -std=c99
+CFLAGS	+= -O2 -g
+# Assembly (gcc) flags
+SFLAGS	+= -I$(HDR_DIR)
+SFLAGS	+= -D__ASSEMBLER__
+SFLAGS	+= -mabi=lp64 -march=rv64imac -mcmodel=medany
+SFLAGS	+= -O2 -g
+# Linker (ld) flags
+LDFLAGS = -nostdlib -T$(LDS)
 
-# Build rules
+
 .PHONY: all
-all: $(BUILDDIR) $(ELF)
+all: $(BUILD_DIR) $(ELF) $(DAS)
 
 .PHONY: clean
 clean: 
-	@rm -fr $(BUILDDIR)
+	@rm -rf $(BUILD_DIR)
 
-tags: $(wildcard src/*) $(wildcard include/*)
-	@echo Generating tags for src/ and include/...
-	@ctags -R src/ include/
-	@echo Done.
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
-$(BUILDDIR): 
-	@mkdir -p $@
+$(BUILD_DIR)/%.c.o: $(SRC_DIR)/%.c $(HDR_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
-	$(CC) $(C_FLAGS) -c $< -o $@
-	$(OBJDUMP) -d $@ > $@.da
+$(BUILD_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDR_DIR)
+	$(CC) $(SFLAGS) -c $< -o $@
 
+%.da: %.o 
+	$(OBJDUMP) -d $< > $@
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.S $(HEADERS)
-	$(CC) $(S_FLAGS) -c $< -o $@
-	$(OBJDUMP) -d $@ > $@.da
+%.da: %.elf
+	$(OBJDUMP) -d $< > $@
 
-$(ELF): $(S_OBJECTS) $(C_OBJECTS)
-	$(LD) $(LD_FLAGS) $(C_OBJECTS) $(S_OBJECTS) -o $@
-	$(OBJDUMP) -d $@ > $@.da
-	$(SIZE) $(S_OBJECTS) $(C_OBJECTS) $(ELF)
+$(ELF): $(OBJS) $(LDS)
+	$(LD) $(LDFLAGS) $(OBJS) -o $@
