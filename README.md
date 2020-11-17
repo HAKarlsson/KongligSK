@@ -3,33 +3,23 @@ KongligSK (~Royal Separation Kernel) is a separation kernel for RISC-V targeting
 
 *Projected completion date 2025.*
 
-## Target Hardware
-KongligSK targets single core RISC-V (RV32IMAC or RV64IMAC) implementations with only machine mode and user mode (i.e., no MMU or supervisor mode). We believe KongligSK will be suitable for secure coprocessors, embedded applications with safety and security requirements, and perhaps networking equipment.
-
 ## Kernel goals
 
-Here we have the kernel's design goals.
-
-- A separation kernel should be completely verified. We consider two approaches to the verification.
+- **Formal Verification.** A separation kernel should be completely verified. We consider two approaches to the verification.
 
     - We formally verify the C code with respect to a formal model of the kernel and the RISC-V specification. This allows us to compile the kernel with formally verified compiler [CompCert](https://github.com/AbsInt/CompCert), and get a fully formally verified kernel.
 
     - We formally verify the kernel binary using [HolBA](https://github.com/kth-step/HolBA), allowing us to use any compiler and thus get better optimization.
 
-- Security
-A separation kernel secures processes with spatial and temporal isolation.
+- **Security.** A separation kernel should secures processes with spatial and temporal isolation.
 
-- Performance 
-Fast context switches and IPC calls are essential for a separation kernel.
+- **Performance.** Fast context switches and IPC calls are essential for a separation kernel.
 
-- Size 
-A small footprint is essential for both performance and embedded systems.
+- **Small footprint.** A small footprint is important for most embedded systems.
 
-- Extensible
-RISC-V has a lot of extensions (official and custom), so the kernel should be comfortably extensible.
+- **Extensible.** RISC-V has a lot of extensions (official and custom), these extension can invalidate the kernel verification. We want to synthesize kernel code that extends the kernel functionality and verification.
 
-- Real-time properties 
-RT properties makes the kernel suitable for some RT applications.
+- **Real-time properties.** RT properties makes the kernel suitable for some RT applications. Exact properties TBD.
 
 ## API
 TBD.
