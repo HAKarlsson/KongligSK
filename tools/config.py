@@ -31,7 +31,7 @@ def parse_yaml(filename):
 
 def print_defs(defs):
     for name, val in defs.items():
-        print(f"#define {name:20} {val}")
+        print(f"#define {name:16} {val}")
 
 
 
