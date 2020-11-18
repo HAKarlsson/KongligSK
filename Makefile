@@ -48,11 +48,14 @@ LDFLAGS = -nostdlib -T$(LDS)
 
 
 .PHONY: all
-all: $(BUILD_DIR) $(ELF) $(DAS)
+all: $(BUILD_DIR) config elf disassembly 
 
 .PHONY: clean
 clean: 
 	@rm -rf $(BUILD_DIR) $(CONFIG_HDR)
+
+.PHONY: config
+config: $(CONFIG_HDR)
 
 .PHONY: elf
 elf: $(ELF)
@@ -60,11 +63,8 @@ elf: $(ELF)
 .PHONY: disassembly 
 disassembly: $(DAS)
 
-.PHONY: config
-config: $(CONFIG_HDR)
-
 $(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/%.c.o: $(SRC_DIR)/%.c $(HDR_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -79,7 +79,7 @@ $(BUILD_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDR_DIR)
 	$(OBJDUMP) -d $< > $@
 
 $(CONFIG_HDR): $(CONFIG)
-	tools/config.py $(CONFIG) > $(CONFIG_HDR)
+	tools/config.py $(CONFIG) > $(CONFIG_HDR); \
 
-$(ELF): $(CONFIG_HDR) $(OBJS)  $(LDS)
+$(ELF): $(OBJS) $(LDS)
 	$(LD) $(LDFLAGS) $(OBJS) -o $@

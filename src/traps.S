@@ -24,7 +24,6 @@
 .global TrapEntry
 .global TrapExit 
 
-.align 4 
 /** TrapEntry(void) 
  * On a user-mode trap, we come to the trap entry.
  * The trap entry must do the following:
@@ -33,6 +32,7 @@
  * - Load kernel registers.
  * - Call the kernel body which handles the actual trap.
  */
+.align 4 
 TrapEntry:
     /* Save user a0, and load pointer to PCB. */
     csrrw   a0, mscratch, a0

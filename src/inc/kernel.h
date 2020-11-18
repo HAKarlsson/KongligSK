@@ -74,16 +74,15 @@ typedef struct ut_regs {
 } ut_regs_t;
 
 typedef struct pmp {
-    uintptr_t pmpcfg0;
-    uintptr_t pmpcfg1;
-    uintptr_t pmpaddr0;
-    uintptr_t pmpaddr1;
-    uintptr_t pmpaddr2;
-    uintptr_t pmpaddr3;
-    uintptr_t pmpaddr4;
-    uintptr_t pmpaddr5;
-    uintptr_t pmpaddr6;
-    uintptr_t pmpaddr7;
+    uintptr_t cfg0;
+    uintptr_t addr0;
+    uintptr_t addr1;
+    uintptr_t addr2;
+    uintptr_t addr3;
+    uintptr_t addr4;
+    uintptr_t addr5;
+    uintptr_t addr6;
+    uintptr_t addr7;
 } pmp_t;
 
 /* PCB of a user-mode process. */

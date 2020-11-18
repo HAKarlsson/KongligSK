@@ -19,7 +19,7 @@
 
 #include "csr.h"
 #include "traps.h"
-Process processes[NR_PROCS]; // = CONFIG_PROC;
+Process processes[NR_PROCS] = __PROCS__;
 Inbox inboxes[NR_PROCS][NR_PROCS];
 
 void InitCPU(void)

@@ -14,16 +14,19 @@ constants:
 #     We supports at most eight PMP regions and only
 #     the NA4/NAPOT type PMP configuration.
 #     rwx: Read, write and execute permissions.
-#     base: Base address of memory region.
-#     size: log_2(size of region in bytes)
+#     base: Base address of memory region aligned with 2^size.
+#     size: 2^size memory region.
 processes:
-    - pc: 0x20100000
+    - regs:
+        pc: 0x20100000
       pmp:
+          - {rwx: rx, base: 0x20100000, size: 4}
           - {rwx: rx, base: 0x20100000, size: 20}
           - {rwx: rw, base: 0x80001000, size: 12}
           - {rwx: rw, base: 0x10012000, size: 12}
           - {rwx: rw, base: 0x10013000, size: 12}
-    - pc: 0x20200000
+    - regs: 
+        pc: 0x20200000
       pmp:
           - {rwx: rx, base: 0x20200000, size: 20}
           - {rwx: rw, base: 0x80002000, size: 12}
