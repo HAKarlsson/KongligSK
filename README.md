@@ -7,19 +7,19 @@ KongligSK (~Royal Separation Kernel) is a separation kernel for RISC-V targeting
 
 - **Formal Verification.** A separation kernel should be completely verified. We consider two approaches to the verification.
 
-    - We formally verify the C code with respect to a formal model of the kernel and the RISC-V specification. This allows us to compile the kernel with formally verified compiler [CompCert](https://github.com/AbsInt/CompCert), and get a fully formally verified kernel.
+    1. We formally verify the C code with respect to a formal model of the kernel and the RISC-V specification. This allows us to compile the kernel with formally verified compiler [CompCert](https://github.com/AbsInt/CompCert), and get a fully formally verified kernel.
 
-    - We formally verify the kernel binary using [HolBA](https://github.com/kth-step/HolBA), allowing us to use any compiler and thus get better optimization.
+    2. We formally verify the kernel binary using [HolBA](https://github.com/kth-step/HolBA), allowing us to use any compiler and thus get better optimization.
 
-- **Security.** A separation kernel should secures processes with spatial and temporal isolation.
+- **Security.** A separation kernel should secure processes with spatial and temporal isolation.
 
 - **Performance.** Fast context switches and IPC calls are essential for a separation kernel.
 
 - **Small footprint.** A small footprint is important for most embedded systems.
 
-- **Extensible.** RISC-V has a lot of extensions (official and custom), these extension can invalidate the kernel verification. We want to synthesize kernel code that extends the kernel functionality and verification.
+- **Extensible.** RISC-V has a lot of extensions (official and custom) and these extension can invalidate the kernel verification. We want to synthesize kernel code that extends the kernel functionality and verification.
 
-- **Real-time properties.** RT properties makes the kernel suitable for some RT applications. Exact properties TBD.
+- **Real-time properties.** Real-time properties makes the kernel suitable for some RT applications. Exact properties TBD.
 
 ## API
 TBD.
@@ -37,7 +37,7 @@ TBD.
 
 4. Create a formal model of the kernel in [HOL](https://hol-theorem-prover.org/).
 
-5. ???
+5. TBD.
 
 ## Related Projects 
 - [seL4](https://sel4.systems/) - A verified and secure µ-kernel, suitable for more capable hardware.
