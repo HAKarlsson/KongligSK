@@ -49,15 +49,15 @@ def mk_header(defines):
     lines.append("#endif")
     return '\n'.join(lines)
 
-def mk_pmp(pmp_cfgs):
+def mk_pmp(proc_id, pmp_confs):
     pmp = dict()
     pmp['cfg0'] = 0
-    for i, pmp_cfg in enumerate(pmp_cfgs):
-        rwx = pmp_cfg['rwx']
-        base = pmp_cfg['base']
-        size = pmp_cfg['size']
-        assert (size > 1), \
-            "PMP regions size must be at least 4 bytes"
+    for i, pmp_conf in enumerate(pmp_confs):
+        rwx = pmp_conf['rwx']
+        base = pmp_conf['base']
+        lg_size = pmp_conf['lg_size']
+        assert (lg_size > 1), \
+            f"process {proc_id+1}, pmp {i+1}: lg_size must be greater than 1."
 
         cfg = 0
         if "r" in rwx:
@@ -67,15 +67,16 @@ def mk_pmp(pmp_cfgs):
         if "x" in rwx:
             cfg |= 4
 
-        if size == 2:
+        if lg_size == 2:
             cfg |= 2 << 3
             na_mask = 0
         else:
             cfg |= 3 << 3
-            na_mask = int("1" * size, 2)
+            na_mask = int("1"*lg_size, 2)
             na_mask >>= 3
-            assert (base % (2**size) == 0), \
-                "PMP regions not aligned with the size"
+            assert (base % (2**lg_size) == 0), \
+                (f"process {proc_id+1}, pmp {i+1}: base (0x{base:x}) must "
+                 f"be a multiple of 2^lg_size (0x{2**lg_size:x}).")
         
         pmp['cfg0'] |= (cfg << (8 * i))
         pmp[f'addr{i}'] = base >> 2 | na_mask
@@ -83,11 +84,11 @@ def mk_pmp(pmp_cfgs):
 
 def mk_defines(data):
     defines = data['constants']
-    processes = data['processes']
-    defines['NR_PROCS'] = len(processes)
-    for proc in processes:
-        proc['pmp'] = mk_pmp(proc['pmp'])
-    defines['__PROCS__'] = mk_struct(processes)
+    procs = data['processes']
+    for i, proc in enumerate(procs):
+        proc['pmp'] = mk_pmp(i, proc['pmp'])
+    defines['__PROCS__'] = mk_struct(procs)
+    defines['NR_PROCS'] = len(procs)
     return defines
 
 

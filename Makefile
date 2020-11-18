@@ -23,6 +23,7 @@ S_SRCS	= $(wildcard $(SRC_DIR)/*.S)
 C_OBJS	= $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%.o, $(C_SRCS))
 S_OBJS	= $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%.o, $(S_SRCS))
 OBJS    = $(C_OBJS) $(S_OBJS)
+HDRS	= $(wildcard $(HDR_DIR)/*.h) $(CONFIG_HDR)
 # Disassembly files (objdump)
 DAS	= $(patsubst %.o, %.da, $(OBJS)) \
 	  $(patsubst %.elf, %.da, $(ELF))
@@ -66,10 +67,10 @@ disassembly: $(DAS)
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/%.c.o: $(SRC_DIR)/%.c $(HDR_DIR)
+$(BUILD_DIR)/%.c.o: $(SRC_DIR)/%.c $(HDRS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDR_DIR)
+$(BUILD_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS)
 	$(CC) $(SFLAGS) -c $< -o $@
 
 %.da: %.o 
@@ -79,7 +80,7 @@ $(BUILD_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDR_DIR)
 	$(OBJDUMP) -d $< > $@
 
 $(CONFIG_HDR): $(CONFIG)
-	tools/config.py $(CONFIG) > $(CONFIG_HDR); \
+	tools/config.py $(CONFIG) > $(CONFIG_HDR)
 
 $(ELF): $(OBJS) $(LDS)
 	$(LD) $(LDFLAGS) $(OBJS) -o $@

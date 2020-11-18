@@ -9,24 +9,21 @@ constants:
 
 
 # Process configurations
-# PC: Initial program counter
-# PMP: Physical Memory Protection
-#     We supports at most eight PMP regions and only
-#     the NA4/NAPOT type PMP configuration.
-#     rwx: Read, write and execute permissions.
-#     base: Base address of memory region aligned with 2^size.
-#     size: 2^size memory region.
+# regs: Initial register values
+#   pc: Initial program counter
+#   ...
+# pmp: Physical Memory Protection
+#   rwx:     Read, write and execute permissions.
+#   base:    Base address of memory region, must be aligned with 2^lsize.
+#   lg_size: log_2(Size of memory region).
 processes:
-    - regs:
-        pc: 0x20100000
+    - regs.pc: 0x20100000
       pmp:
-          - {rwx: rx, base: 0x20100000, size: 4}
-          - {rwx: rx, base: 0x20100000, size: 20}
-          - {rwx: rw, base: 0x80001000, size: 12}
-          - {rwx: rw, base: 0x10012000, size: 12}
-          - {rwx: rw, base: 0x10013000, size: 12}
-    - regs: 
-        pc: 0x20200000
+          - {rwx: rx, base: 0x20100000, lg_size: 20}
+          - {rwx: rw, base: 0x80001000, lg_size: 12}
+          - {rwx: rw, base: 0x10012000, lg_size: 12}
+          - {rwx: rw, base: 0x10013000, lg_size: 12}
+    - regs.pc: 0x20200000
       pmp:
-          - {rwx: rx, base: 0x20200000, size: 20}
-          - {rwx: rw, base: 0x80002000, size: 12}
+          - {rwx: rx, base: 0x20200000, lg_size: 20}
+          - {rwx: rw, base: 0x80002000, lg_size: 12}
