@@ -25,7 +25,7 @@ S_OBJS	= $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%.o, $(S_SRCS))
 OBJS    = $(C_OBJS) $(S_OBJS)
 # Disassembly files (objdump)
 DAS	= $(patsubst %.o, %.da, $(OBJS)) \
-	  $(patsubst %.elf, %.da, $(ELF)) \
+	  $(patsubst %.elf, %.da, $(ELF))
 
 # Toolchain
 CC	= $(RISCV_PREFIX)gcc
@@ -53,6 +53,15 @@ all: $(BUILD_DIR) $(ELF) $(DAS)
 .PHONY: clean
 clean: 
 	@rm -rf $(BUILD_DIR) $(CONFIG_HDR)
+
+.PHONY: elf
+elf: $(ELF)
+
+.PHONY: disassembly 
+disassembly: $(DAS)
+
+.PHONY: config
+config: $(CONFIG_HDR)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)

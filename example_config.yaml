@@ -1,4 +1,4 @@
-DEFINES:
+constants:
     # Quantum/Timeslice length in ms
     QUANTUM: 100
     # Real-time clock frequency
@@ -12,18 +12,18 @@ DEFINES:
 # PC: Initial program counter
 # PMP: Physical Memory Protection
 #     We supports at most eight PMP regions and only
-#     the NAPOT type PMP configuration.
-#     RWX: Read, write and execute permissions.
-#     BASE: Base address of memory region.
-#     SIZE: log_2(size of region), SIZE: 20 => 1MB region.
-PROCESSES:
-    - PC: 0x20100000
-      PMP:
-          - {RWX: rx, BASE: 0x20100000, SIZE: 20}
-          - {RWX: rw, BASE: 0x80001000, SIZE: 12}
-          - {RWX: rw, BASE: 0x10012000, SIZE: 12}
-          - {RWX: rw, BASE: 0x10013000, SIZE: 12}
-    - PC: 0x20200000
-      PMP:
-          - {RWX: rx, BASE: 0x20200000, SIZE: 20}
-          - {RWX: rw, BASE: 0x80002000, SIZE: 12}
+#     the NA4/NAPOT type PMP configuration.
+#     rwx: Read, write and execute permissions.
+#     base: Base address of memory region.
+#     size: log_2(size of region in bytes)
+processes:
+    - pc: 0x20100000
+      pmp:
+          - {rwx: rx, base: 0x20100000, size: 20}
+          - {rwx: rw, base: 0x80001000, size: 12}
+          - {rwx: rw, base: 0x10012000, size: 12}
+          - {rwx: rw, base: 0x10013000, size: 12}
+    - pc: 0x20200000
+      pmp:
+          - {rwx: rx, base: 0x20200000, size: 20}
+          - {rwx: rw, base: 0x80002000, size: 12}

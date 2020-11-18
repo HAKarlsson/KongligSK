@@ -15,31 +15,40 @@
 # You should have received a copy of the GNU General Public License
 # along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
 
-import argparse
-import yaml
 
-def get_arguments():
-    parser = argparse.ArgumentParser(description='Generate KongligSK code from configuration file.')
-    parser.add_argument('config', help='Path to configuration file (YAML).')
+def get_args():
+    import argparse
+    parser = argparse.ArgumentParser(description='Generate KongligSK configuration header (config.h).')
+    parser.add_argument('conf_file', help='Path to YAML configuration file.')
     return parser.parse_args()
 
-def parse_yaml(filename):
-    with open(filename, 'r') as f:
+
+def get_config_data(conf_file):
+    import yaml
+    with open(conf_file, 'r') as f:
         data = yaml.load(f, Loader=yaml.Loader)
     return data
 
 
-def print_defs(defs):
-    for name, val in defs.items():
-        print(f"#define {name:16} {val}")
+class Config:
+    def __init__(self, config):
+        self.constants = config['constants']
+        self._processes(config['processes'])
 
+    def _processes(self, procs):
+        self.constants['NR_PROCS'] = len(procs)
 
+    def __repr__(self):
+        lines = list()
+        lines.append("/* Generated file */")
+        lines.append("#ifndef KSK_CONFIG_H")
+        lines.append("#define KSK_CONFIG_H")
+        lines.extend(f"#define {k} {v}" for k, v in self.constants.items())
+        lines.append("#endif /* KSK_CONFIG_H */")
+        return '\n'.join(lines)
 
 if __name__ == "__main__":
-    args = get_arguments()
-    conf = parse_yaml(args.config)
-    print("#ifndef KSK_CONFIG_H")
-    print("#define KSK_CONFIG_H")
-    conf["DEFINES"]["NR_PROCS"] = len(conf["PROCESSES"])
-    print_defs(conf["DEFINES"])
-    print("#endif /* KSK_CONFIG_H */")
+    args = get_args()
+    data = get_config_data(args.conf_file)
+    config = Config(data)
+    print(config)
