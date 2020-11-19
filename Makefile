@@ -79,8 +79,14 @@ $(BUILD_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS)
 %.da: %.elf
 	$(OBJDUMP) -d $< > $@
 
+# Format the file if we have clang-format
+ifeq (,$(shell which clang-format))
 $(CONFIG_HDR): $(CONFIG)
 	tools/config.py $(CONFIG) > $(CONFIG_HDR)
+else
+$(CONFIG_HDR): $(CONFIG)
+	tools/config.py $(CONFIG) | clang-format --style=WebKit > $(CONFIG_HDR)
+endif
 
 $(ELF): $(OBJS) $(LDS)
 	$(LD) $(LDFLAGS) $(OBJS) -o $@
