@@ -9,26 +9,29 @@ CONFIG		?= example/config.yaml
 # Linker script
 LDS		?= example/konglig.lds
 # Build directory
-BUILD_DIR	?= build
+BUILD_DIR 	?= build
+OBJ_DIR		?= $(BUILD_DIR)
+DA_DIR		?= $(BUILD_DIR)
+ELF_DIR		?= $(BUILD_DIR)
 # RISC-V Toolchain prefix
 RISCV_PREFIX	?= riscv64-unknown-elf-
-# ELF path
-ELF		?= $(BUILD_DIR)/konglig.elf
 
 # Configuration header
-CONFIG_HDR=$(HDR_DIR)/config.h
+CONFIG_HDR	= $(HDR_DIR)/config.h
+# ELF path
+ELF		= $(ELF_DIR)/konglig.elf
 
 # Source files, C and assembly
 C_SRCS	= $(wildcard $(SRC_DIR)/*.c) 
 S_SRCS	= $(wildcard $(SRC_DIR)/*.S)
 # Object files
-C_OBJS	= $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%.o, $(C_SRCS))
-S_OBJS	= $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%.o, $(S_SRCS))
+C_OBJS	= $(patsubst $(SRC_DIR)/%, $(OBJ_DIR)/%.o, $(C_SRCS))
+S_OBJS	= $(patsubst $(SRC_DIR)/%, $(OBJ_DIR)/%.o, $(S_SRCS))
 OBJS    = $(C_OBJS) $(S_OBJS)
 HDRS	= $(wildcard $(HDR_DIR)/*.h) $(CONFIG_HDR)
 # Disassembly files (objdump)
-DAS	= $(patsubst %.o, %.da, $(OBJS)) \
-	  $(patsubst %.elf, %.elf.da, $(ELF))
+DAS	= $(patsubst $(OBJ_DIR)/%.o, $(DA_DIR)/%.da, $(OBJS)) \
+	  $(patsubst $(ELF_DIR)/%.elf, $(DA_DIR)/%.elf.da, $(ELF))
 
 # Toolchain
 CC	= $(RISCV_PREFIX)gcc
@@ -56,7 +59,8 @@ all: $(BUILD_DIR) config elf disassembly
 
 .PHONY: clean
 clean: 
-	rm -f $(BUILD_DIR)/* $(CONFIG_HDR)
+	rm -f $(DAS) $(OBJS) $(CONFIG_HDR)
+	rm -rf $(BUILD_DIR)
 
 .PHONY: config
 config: $(CONFIG_HDR)
@@ -85,16 +89,16 @@ cloc:
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/%.c.o: $(SRC_DIR)/%.c $(HDRS)
+$(OBJ_DIR)/%.c.o: $(SRC_DIR)/%.c $(HDRS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS)
+$(OBJ_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS)
 	$(CC) $(SFLAGS) -c $< -o $@
 
-%.da: %.o 
+$(DA_DIR)/%.da: $(OBJ_DIR)/%.o 
 	$(OBJDUMP) -d $< > $@
 
-%.elf.da: %.elf
+$(DA_DIR)/%.elf.da: $(ELF_DIR)/%.elf
 	$(OBJDUMP) -d $< > $@
 
 # Format the file if we have clang-format
@@ -106,5 +110,5 @@ $(CONFIG_HDR): $(CONFIG)
 	tools/config.py $(CONFIG) | clang-format --style=WebKit > $(CONFIG_HDR)
 endif
 
-$(ELF): $(OBJS) $(LDS)
+$(ELF_DIR)/%.elf: $(OBJS) $(LDS)
 	$(LD) $(LDFLAGS) $(OBJS) -o $@
