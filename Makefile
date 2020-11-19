@@ -5,9 +5,9 @@ SRC_DIR	= src
 HDR_DIR = src/inc
 
 # Configuration file
-CONFIG		?= example_config.yaml
+CONFIG		?= example/config.yaml
 # Linker script
-LDS		?= example_linker_script.lds
+LDS		?= example/konglig.lds
 # Build directory
 BUILD_DIR	?= build
 # RISC-V Toolchain prefix
@@ -98,6 +98,7 @@ $(BUILD_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS)
 	$(OBJDUMP) -d $< > $@
 
 # Format the file if we have clang-format
+ifeq (,$(shell which clang-format))
 $(CONFIG_HDR): $(CONFIG)
 	tools/config.py $(CONFIG) > $(CONFIG_HDR)
 else

@@ -52,8 +52,8 @@ sudo apt install make python3 gcc-riscv64-unknown-elf cloc clang-format
 
 ### Make options
 To use one of the following options, do `make <OPTION1>=<value1> <OPTION2>=<value2> ..`, for example `make CONFIG_FILE=my_configuration.yaml`.
-- `CONFIG` - configuration file, see example\_config.yaml. (default = example\_config.yaml)
-- `LDS` - Path of linker script (default = example\_linker\_script.lds)
+- `CONFIG` - configuration file, see example/config.yaml. (default = example/config.yaml)
+- `LDS` - Path of linker script (default = example/konglig.lds)
 - `BUILD_DIR` -  target directory, all generated binary and disassembly files goes here (default = build)
 - `RISCV_PREFIX` - Prefix of your RISC-V toolchain. (default = riscv64-unknown-elf-)
 - `ELF` - Path of generated ELF file (default = BUILD\_DIR/konglig.elf
