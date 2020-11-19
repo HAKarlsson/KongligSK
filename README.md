@@ -1,5 +1,5 @@
 # KongligSK
-KongligSK (~Royal Separation Kernel) is a separation kernel for RISC-V targeting secure embedded processors (M+U-mode and PMP). KongligSK is a research kernel for features, designs, and build system that may be included in [OpenMZ](https://github.com/castor-software/openmz). KongligSK is a part of a research project on provably secure at KTH Royal Institute of Technology ([KTH](https://www.kth.se/en)), Center for Cyber Defence and Information Security ([CDIS](https://www.kth.se/cdis)).
+KongligSK (~Royal Separation Kernel) is a separation kernel for RISC-V targeting secure embedded processors (M+U-mode and PMP). KongligSK is a research kernel for features, designs, and build system that may be included in [OpenMZ](https://github.com/castor-software/openmz). KongligSK is a part of a research project on provably secure systems at KTH Royal Institute of Technology ([KTH](https://www.kth.se/en)), Center for Cyber Defence and Information Security ([CDIS](https://www.kth.se/cdis)).
 
 *Projected completion date 2025.*
 
@@ -88,15 +88,8 @@ TODO
 ## Copyright
 Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
 
-KongligSK is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+KongligSK is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-KongligSK is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+KongligSK is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
