@@ -26,12 +26,13 @@ OBJS    = $(C_OBJS) $(S_OBJS)
 HDRS	= $(wildcard $(HDR_DIR)/*.h) $(CONFIG_HDR)
 # Disassembly files (objdump)
 DAS	= $(patsubst %.o, %.da, $(OBJS)) \
-	  $(patsubst %.elf, %.da, $(ELF))
+	  $(patsubst %.elf, %.elf.da, $(ELF))
 
 # Toolchain
 CC	= $(RISCV_PREFIX)gcc
 LD	= $(RISCV_PREFIX)ld
 OBJDUMP	= $(RISCV_PREFIX)objdump
+SIZE	= $(RISCV_PREFIX)size
 
 # C (gcc) flags
 CFLAGS	= -I$(HDR_DIR)
@@ -49,11 +50,11 @@ LDFLAGS = -nostdlib -T$(LDS)
 
 
 .PHONY: all
-all: $(BUILD_DIR) config elf disassembly 
+all: $(BUILD_DIR) config elf disassembly
 
 .PHONY: clean
 clean: 
-	@rm -rf $(BUILD_DIR) $(CONFIG_HDR)
+	rm -f $(BUILD_DIR)/* $(CONFIG_HDR)
 
 .PHONY: config
 config: $(CONFIG_HDR)
@@ -64,11 +65,20 @@ elf: $(ELF)
 .PHONY: disassembly 
 disassembly: $(DAS)
 
-ifneq ("",$(shell which clang-format))
+.PHONY: da 
+da: $(DAS)
+
 .PHONY: format
 format:
 	clang-format -i --style=WebKit $(SRC_DIR)/*.c $(HDR_DIR)/*.h
-endif
+
+.PHONY: size
+size: $(OBJS) $(ELF)
+	$(SIZE) $(OBJS) $(ELF)
+
+.PHONY: cloc 
+cloc:
+	cloc $(HDRS) $(C_SRCS) $(S_SRCS)
 
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
@@ -82,7 +92,7 @@ $(BUILD_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS)
 %.da: %.o 
 	$(OBJDUMP) -d $< > $@
 
-%.da: %.elf
+%.elf.da: %.elf
 	$(OBJDUMP) -d $< > $@
 
 # Format the file if we have clang-format

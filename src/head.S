@@ -27,7 +27,6 @@
 _start:
     /* disable interrupts */
     csrwi   CSR_MIE, 0
-    fence.i
 
     /* load gp, sp and fp */
 .option push

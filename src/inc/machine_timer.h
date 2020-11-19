@@ -19,6 +19,6 @@
 #define KSK_MACHINE_TIMER_H
 #include "kernel.h"
 
-Process* HandleMachineTimer(Process* proc, uintptr_t mcause);
+Process* HandleMachineTimer(Process* proc, uintptr_t mcause, uintptr_t mtval);
 
 #endif /* KSK_MACHINE_TIMER_H */

@@ -23,12 +23,10 @@
 #include "user_trap.h"
 #include "util.h"
 
-typedef Process* (*ExcptHandler)(Process* pcb,
-    uintptr_t mcause,
-    uintptr_t mtval);
-typedef Process* (*IntrpHandler)(Process* pcb, uintptr_t mcause);
+typedef Process* (*Handler)(Process* pcb, uintptr_t mcause, uintptr_t mtval);
 
-static const ExcptHandler excpt_handlers[] = {
+static const Handler handlers[] = {
+    /* Execeptions */
     [MCAUSE_EXCPT_INSTRUCTION_ADDRESS_MISALIGNED] = HandleUserException,
     [MCAUSE_EXCPT_INSTRUCTION_ACCESS_FAULT] = HandleUserException,
     [MCAUSE_EXCPT_ILLEGAL_INSTRUCTION] = 0,
@@ -43,17 +41,15 @@ static const ExcptHandler excpt_handlers[] = {
     [MCAUSE_EXCPT_INSTRUCTION_PAGE_FAULT] = 0,
     [MCAUSE_EXCPT_LOAD_PAGE_FAULT] = 0,
     [MCAUSE_EXCPT_STORE_PAGE_FAULT] = 0,
-};
-
-static const IntrpHandler intrp_handlers[] = {
-    [MCAUSE_INTRP_MACHINE_SOFTWARE] = 0,
-    [MCAUSE_INTRP_MACHINE_TIMER] = HandleMachineTimer,
-    [MCAUSE_INTRP_MACHINE_EXTERN] = 0,
+    /* Interrupts */
+    [MCAUSE_INTRP_MACHINE_SOFTWARE | 0x10] = 0,
+    [MCAUSE_INTRP_MACHINE_TIMER | 0x10] = HandleMachineTimer,
+    [MCAUSE_INTRP_MACHINE_EXTERN | 0x10] = 0,
 };
 
 Process* TrapHandler(Process* pcb, uintptr_t mcause, uintptr_t mtval)
 {
-    if ((intptr_t)mcause < 0)
-        return intrp_handlers[~MSb & mcause](pcb, mcause);
-    return excpt_handlers[mcause](pcb, mcause, mtval);
+    // If mcause is interrupt, this should be 0x10 (16), otherwise 0.
+    uintptr_t intrp_bit = (mcause >> 63) << 4;
+    return handlers[mcause | intrp_bit](pcb, mcause, mtval);
 }
