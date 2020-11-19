@@ -36,10 +36,10 @@ def mk_struct(d, indentlevel=1):
     indent = "\t" * indentlevel
     if isinstance(d, list) or isinstance(d, map):
         s = f", \\\n{indent}".join(mk_struct(v, indentlevel=indentlevel) for v in d)
-        return f"{{{s}}}" 
+        return f"{{ \\\n{s} \\\n}}" 
     if isinstance(d, dict):
         s = f", \\\n{indent}".join(f".{k} = {mk_struct(v,indentlevel=indentlevel+1)}" for k, v in d.items())
-        return f"{{ \\\n{indent}{s}}}" 
+        return f"{{ \\\n{indent}{s} \\\n{indent}}}" 
     return f"0x{d:02x}"
 
 def mk_header(defines):
@@ -88,6 +88,7 @@ def mk_defines(data):
     defines = data['constants']
     procs = data['processes']
     for i, proc in enumerate(procs):
+        proc['id'] = i
         proc['pmp'] = mk_pmp(i, proc['pmp'])
     defines['__PROCS__'] = mk_struct(procs)
     defines['NR_PROCS'] = len(procs)

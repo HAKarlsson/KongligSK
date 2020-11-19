@@ -42,16 +42,25 @@ SIZE	= $(RISCV_PREFIX)size
 # C (gcc) flags
 CFLAGS	= -I$(HDR_DIR)
 CFLAGS	+= -mabi=lp64 -march=rv64imac -mcmodel=medany
-CFLAGS	+= -Wall -Wextra -Wno-unused-parameter
-CFLAGS	+= -std=c99
+CFLAGS	+= -Wall -Werror -Wextra 
+CFLAGS	+= -Wno-unused-parameter
+CFLAGS	+= -fno-stack-protector -fno-asynchronous-unwind-tables
+CFLAGS	+= -Wstrict-prototypes -Wmissing-prototypes 
+CFLAGS	+= -Wmissing-declarations
+CFLAGS	+= -Wundef -Wpointer-arith -ffreestanding
+CFLAGS	+= -fno-pic
+#CFLAGS	+= -fstack-usage
+CFLAGS	+= -std=c99 
 CFLAGS	+= -O2 -g
 # Assembly (gcc) flags
 SFLAGS	+= -I$(HDR_DIR)
 SFLAGS	+= -D__ASSEMBLER__
-SFLAGS	+= -mabi=lp64 -march=rv64imac -mcmodel=medany
-SFLAGS	+= -O2 -g
+SFLAGS	+= -mabi=lp64 -march=rv64imac
+SFLAGS	+= -fno-pic
+SFLAGS	+= -g
 # Linker (ld) flags
-LDFLAGS = -nostdlib -T$(LDS)
+LDFLAGS += -nostdlib -T$(LDS)
+LDFLAGS += --relax
 
 
 .PHONY: all

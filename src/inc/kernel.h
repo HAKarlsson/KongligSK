@@ -17,16 +17,18 @@
  */
 #ifndef KSK_KERNEL_H
 #define KSK_KERNEL_H
-#include <stdint.h>
 
 #include "config.h"
 #include "util.h"
+
+typedef unsigned long uintptr_t;
 
 typedef struct inbox {
     uintptr_t full;
     uintptr_t msgs[2];
 } Inbox;
 
+/* General purpose registers */
 typedef struct regs {
     uintptr_t pc;
     uintptr_t ra;
@@ -62,6 +64,7 @@ typedef struct regs {
     uintptr_t t6;
 } regs_t;
 
+/* User trap setup and handling registers */
 typedef struct ut_regs {
     uintptr_t ustatus;
     uintptr_t uie;
@@ -73,6 +76,7 @@ typedef struct ut_regs {
     uintptr_t uip;
 } ut_regs_t;
 
+/* Physical memory protection registers */
 typedef struct pmp {
     uintptr_t cfg0;
     uintptr_t addr0;
@@ -85,14 +89,17 @@ typedef struct pmp {
     uintptr_t addr7;
 } pmp_t;
 
-/* PCB of a user-mode process. */
+/* Process control block */
 typedef struct process {
     regs_t regs;
     pmp_t pmp;
     ut_regs_t ut_regs;
+    /* Process id */
     uintptr_t id;
 } Process;
 
+void InitCPU(void);
+void InitKernel(void);
 extern Process processes[NR_PROCS];
 extern Inbox inboxes[NR_PROCS][NR_PROCS];
 

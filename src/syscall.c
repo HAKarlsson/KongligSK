@@ -24,6 +24,26 @@
 #include "util.h"
 
 typedef Process* (*Handler)(Process*);
+Process* ksk_YieldTo(Process* proc);
+Process* ksk_Send(Process* proc);
+Process* ksk_Recv(Process* proc);
+
+static const Handler syscall_handlers[] = {
+    [0] = ksk_YieldTo,
+    [1] = ksk_Send,
+    [2] = ksk_Recv,
+};
+
+Process* HandleSyscall(Process* proc, uintptr_t mcause, uintptr_t mtval)
+{
+    uintptr_t syscall_number = proc->regs.t0;
+    if (syscall_number < ARRAY_SIZE(syscall_handlers)) {
+        proc->regs.pc += 4;
+        return syscall_handlers[syscall_number](proc);
+    }
+    return HandleUserException(proc, MCAUSE_EXCPT_ILLEGAL_INSTRUCTION,
+        INST_ECALL);
+}
 
 Process* ksk_YieldTo(Process* proc)
 {
@@ -72,21 +92,4 @@ Process* ksk_Recv(Process* proc)
     proc->regs.a3 = inbox->msgs[1];
     inbox->full = 0;
     return proc;
-}
-
-static const Handler syscall_handlers[] = {
-    [0] = ksk_YieldTo,
-    [1] = ksk_Send,
-    [2] = ksk_Recv,
-};
-
-Process* HandleSyscall(Process* proc, uintptr_t mcause, uintptr_t mtval)
-{
-    uintptr_t syscall_number = proc->regs.t0;
-    if (syscall_number < ARRAY_SIZE(syscall_handlers)) {
-        proc->regs.pc += 4;
-        return syscall_handlers[syscall_number](proc);
-    }
-    return HandleUserException(proc, MCAUSE_EXCPT_ILLEGAL_INSTRUCTION,
-        INST_ECALL);
 }
