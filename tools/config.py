@@ -31,13 +31,15 @@ def get_config_data(conf_file):
     return data
 
 
-def mk_struct(d):
+# TODO: clean this up
+def mk_struct(d, indentlevel=1):
+    indent = "\t" * indentlevel
     if isinstance(d, list) or isinstance(d, map):
-        s = ",".join(mk_struct(v) for v in d)
+        s = f", \\\n{indent}".join(mk_struct(v, indentlevel=indentlevel) for v in d)
         return f"{{{s}}}" 
     if isinstance(d, dict):
-        s = ",".join(f".{k} = {mk_struct(v)}" for k, v in d.items())
-        return f"{{{s}}}" 
+        s = f", \\\n{indent}".join(f".{k} = {mk_struct(v,indentlevel=indentlevel+1)}" for k, v in d.items())
+        return f"{{ \\\n{indent}{s}}}" 
     return f"0x{d:02x}"
 
 def mk_header(defines):
