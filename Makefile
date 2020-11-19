@@ -64,6 +64,12 @@ elf: $(ELF)
 .PHONY: disassembly 
 disassembly: $(DAS)
 
+ifneq ("",$(shell which clang-format))
+.PHONY: format
+format:
+	clang-format -i --style=WebKit $(SRC_DIR)/*.c $(HDR_DIR)/*.h
+endif
+
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
