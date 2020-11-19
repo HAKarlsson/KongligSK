@@ -7,7 +7,7 @@ HDR_DIR = src/inc
 # Configuration file
 CONFIG		?= example_config.yaml
 # Linker script
-LDS		?= konglig.lds
+LDS		?= example_linker_script.lds
 # Build directory
 BUILD_DIR	?= build
 # RISC-V Toolchain prefix
