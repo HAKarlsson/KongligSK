@@ -24,8 +24,43 @@ KongligSK (~Royal Separation Kernel) is a separation kernel for RISC-V targeting
 ## API
 TBD.
 
-## Installation
-TBD.
+## Guide
+KongligSK requires
+- `make` - for building the system (required) 
+- `python3` - for making configuration file (required)
+- `riscv64-unknown-elf-gcc` - compiling source files (required)
+- `riscv64-unknown-elf-ld` - linking object files (required)
+- `riscv64-unknown-elf-objdump` - examine binary files (recommended)
+- `riscv64-unknown-elf-size` - examine binary size (optional) 
+- `cloc` - count lines of code (optional)
+- `clang-format` - format source and header files (optional)
+
+### Ubuntu 20.04 install
+```
+sudo apt install make python3 gcc-riscv64-unknown-elf cloc clang-format
+```
+
+### Make targets
+- `make all` - generate configuration, make binary files and disassembly files.
+- `make clean` - delete binary, and generated configuration files
+- `make config` - generate configuration file
+- `make elf` - make binary files
+- `make disassembly` or `make da` - make disassembly files (.da in build folder) 
+- `make format` - format source and header files
+- `make size` - display size of binary files in bytes
+- `make cloc` - count lines of code
+
+### Make options
+To use one of the following options, do `make <OPTION1>=<value1> <OPTION2>=<value2> ..`, for example `make CONFIG_FILE=my_configuration.yaml`.
+- `CONFIG` - configuration file, see example\_config.yaml. (default = example\_config.yaml)
+- `LDS` - Path of linker script (default = konglig.lds)
+- `BUILD_DIR` -  target directory, all generated binary and disassembly files goes here (default = build)
+- `RISCV_PREFIX` - Prefix of your RISC-V toolchain. (default = riscv64-unknown-elf-)
+- `ELF` - Path of generated ELF file (default = BUILD\_DIR/konglig.elf
+
+### Configuring the Kernel
+
+TODO
 
 ## TODO
 

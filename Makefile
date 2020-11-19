@@ -1,19 +1,21 @@
-# Configuration files
-CONFIG_FILE?=example_config.yaml
-# Build directory
-BUILD_DIR?=build
-# RISC-V Toolchain prefix
-RISCV_PREFIX?=riscv64-unknown-elf-
 
 
 # Source and header directories
 SRC_DIR	= src
 HDR_DIR = src/inc
 
-ELF	?= $(BUILD_DIR)/konglig.elf
-LDS	?= konglig.lds
-CONFIG	?= example_config.yaml
+# Configuration file
+CONFIG		?= example_config.yaml
+# Linker script
+LDS		?= konglig.lds
+# Build directory
+BUILD_DIR	?= build
+# RISC-V Toolchain prefix
+RISCV_PREFIX	?= riscv64-unknown-elf-
+# ELF path
+ELF		?= $(BUILD_DIR)/konglig.elf
 
+# Configuration header
 CONFIG_HDR=$(HDR_DIR)/config.h
 
 # Source files, C and assembly
@@ -96,7 +98,6 @@ $(BUILD_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS)
 	$(OBJDUMP) -d $< > $@
 
 # Format the file if we have clang-format
-ifeq (,$(shell which clang-format))
 $(CONFIG_HDR): $(CONFIG)
 	tools/config.py $(CONFIG) > $(CONFIG_HDR)
 else
