@@ -27,7 +27,7 @@ def get_args():
 
 def get_config_data(conf_file):
     with open(conf_file, 'r') as f:
-        data = yaml.load(f)
+        data = yaml.load(f, Loader=yaml.Loader)
     return data
 
 
