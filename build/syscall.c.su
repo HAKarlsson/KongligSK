@@ -1,0 +1,4 @@
+src/syscall.c:48:10:ksk_YieldTo	0	static
+src/syscall.c:61:10:ksk_Send	0	static
+src/syscall.c:79:10:ksk_Recv	0	static
+src/syscall.c:37:10:HandleSyscall	0	static

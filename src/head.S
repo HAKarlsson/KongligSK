@@ -33,10 +33,13 @@ _start:
 .option norelax
     la      gp, __global_pointer$
 .option pop
+#if __stack_size > 0
     la      sp, __stack_top
     mv      fp, sp
+#endif
 
     call    InitKernel 
+    tail    TrapExit
 
 hang:
     ebreak

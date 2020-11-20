@@ -88,12 +88,16 @@ TrapEntry:
     .option norelax
     la      gp, __global_pointer$
     .option pop
+#if __stack_size > 0
     la      sp, __stack_top
     mv      fp, sp 
+#endif
+    mv	    s0, a0
 
     call    TrapHandler 
 
 TrapExit:
+    beq	    a0, s0, _skip_pmp
     /* Load PMP settings from memory first. */
     /* We only want to use callee saved regs. */
     ld	    t0, PCB_PMPCFG0(a0)
@@ -116,6 +120,7 @@ TrapExit:
     csrw    pmpaddr5, a5
     csrw    pmpaddr6, a6
     csrw    pmpaddr7, a7
+_skip_pmp:
 
     /* We store a pointer to the PCB in MSCRATCH. */
     csrw    mscratch, a0

@@ -22,13 +22,13 @@ CONFIG_HDR	= $(HDR_DIR)/config.h
 ELF		= $(ELF_DIR)/konglig.elf
 
 # Source files, C and assembly
-C_SRCS	= $(wildcard $(SRC_DIR)/*.c) 
-S_SRCS	= $(wildcard $(SRC_DIR)/*.S)
+C_SRCS	+= $(wildcard $(SRC_DIR)/*.c) 
+S_SRCS	+= $(wildcard $(SRC_DIR)/*.S)
 # Object files
 C_OBJS	= $(patsubst $(SRC_DIR)/%, $(OBJ_DIR)/%.o, $(C_SRCS))
 S_OBJS	= $(patsubst $(SRC_DIR)/%, $(OBJ_DIR)/%.o, $(S_SRCS))
 OBJS    = $(C_OBJS) $(S_OBJS)
-HDRS	= $(wildcard $(HDR_DIR)/*.h) $(CONFIG_HDR)
+HDRS	+= $(wildcard $(HDR_DIR)/*.h) $(CONFIG_HDR)
 # Disassembly files (objdump)
 DAS	= $(patsubst $(OBJ_DIR)/%.o, $(DA_DIR)/%.da, $(OBJS)) \
 	  $(patsubst $(ELF_DIR)/%.elf, $(DA_DIR)/%.elf.da, $(ELF))
@@ -49,8 +49,8 @@ CFLAGS	+= -Wstrict-prototypes -Wmissing-prototypes
 CFLAGS	+= -Wmissing-declarations
 CFLAGS	+= -Wundef -Wpointer-arith -ffreestanding
 CFLAGS	+= -fno-pic
-#CFLAGS	+= -fstack-usage
-CFLAGS	+= -std=c99 
+CFLAGS	+= -fstack-usage
+CFLAGS	+= -std=gnu11
 CFLAGS	+= -O2 -g
 # Assembly (gcc) flags
 SFLAGS	+= -I$(HDR_DIR)

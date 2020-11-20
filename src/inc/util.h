@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef KSK_UTIL_H
-#define KSK_UTIL_H
+#pragma once
 
 #define NO_RETURN __attribute__((noreturn))
 
@@ -32,5 +31,3 @@
 #define BIT(n) (1 << (n))
 /* Set bits n, n+1, ..., m-1. */
 #define BITS(n, m) ((ONES << (n)) & (ONES >>> (REG_BITS - (m))))
-
-#endif /* KSK_UTIL_H */

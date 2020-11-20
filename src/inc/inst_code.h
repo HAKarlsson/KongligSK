@@ -15,10 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef KSK_INST_CODE_H
-#define KSK_INST_CODE_H
+#pragma once
 
 #define INST_ECALL 0x00000073
 #define INST_URET 0x00200073
-
-#endif /* KSK_INST_CODE_H */

@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef KSK_KERNEL_H
-#define KSK_KERNEL_H
+#pragma once
 
 #include "config.h"
 #include "util.h"
@@ -102,5 +101,3 @@ void InitCPU(void);
 void InitKernel(void);
 extern Process processes[NR_PROCS];
 extern Inbox inboxes[NR_PROCS][NR_PROCS];
-
-#endif /* KSK_KERNEL_H */

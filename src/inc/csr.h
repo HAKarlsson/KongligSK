@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef KSK_CSR_H
-#define KSK_CSR_H
+#pragma once
 #include "util.h"
 
 #ifndef __ASSEMBLER__
@@ -106,6 +105,7 @@
 #define CSR_PMPCFG5 0x3A5
 #define CSR_PMPCFG6 0x3A6
 #define CSR_PMPCFG7 0x3A7
+/* pmpcfg8-pmpcfg15 for RV32 */
 #define CSR_PMPCFG8 0x3A8
 #define CSR_PMPCFG9 0x3A9
 #define CSR_PMPCFG10 0x3AA
@@ -114,6 +114,7 @@
 #define CSR_PMPCFG13 0x3AD
 #define CSR_PMPCFG14 0x3AE
 #define CSR_PMPCFG15 0x3AF
+
 #define CSR_PMPADDR0 0x3B0
 #define CSR_PMPADDR1 0x3B1
 #define CSR_PMPADDR2 0x3B2
@@ -314,5 +315,3 @@
 /* User CSR fields. */
 #define USTATUS_UIE 0x1
 #define USTATUS_UPIE 0x10
-
-#endif /* KSK_CSR_H */

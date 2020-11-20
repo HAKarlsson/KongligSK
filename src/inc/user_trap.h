@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef KSK_USER_EXCPT_H
-#define KSK_USER_EXCPT_H
+#pragma once
 #include "kernel.h"
 
 /**
@@ -30,5 +29,3 @@ Process* HandleUserException(Process* proc, uintptr_t mcause, uintptr_t mtval);
  * mcause holds the interrupt type.
  */
 Process* HandleUserInterrupt(Process* proc, uintptr_t mcause);
-
-#endif /* KSK_USER_EXCPT_H */

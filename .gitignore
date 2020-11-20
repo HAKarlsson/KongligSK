@@ -1,6 +1,14 @@
+# Object files
 *.o
+
+# Elf files
 *.elf
+
+# configuration header
 src/inc/config.h
 
 # objdump files
 *.da
+
+# stack-usage file
+*.su

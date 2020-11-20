@@ -45,10 +45,8 @@ def mk_struct(d, indentlevel=1):
 def mk_header(defines):
     lines = list()
     lines.append("/* Generated file */")
-    lines.append("#ifndef KSK_CONFIG_H")
-    lines.append("#define KSK_CONFIG_H")
+    lines.append("#pragma once")
     lines.extend(f"#define {k} {v}" for k, v in defines.items())
-    lines.append("#endif")
     return '\n'.join(lines)
 
 def mk_pmp(proc_id, pmp_confs):

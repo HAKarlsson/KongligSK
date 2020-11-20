@@ -15,10 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef KSK_SYSCALL_H
-#define KSK_SYSCALL_H
+#pragma once
 #include "kernel.h"
 
 Process* HandleSyscall(Process* proc, uintptr_t mcause, uintptr_t mtval);
-
-#endif /* KSK_SYSCALL_H */
