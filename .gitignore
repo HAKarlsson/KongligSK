@@ -12,3 +12,6 @@ src/inc/config.h
 
 # stack-usage file
 *.su
+
+# dependency files
+*.d

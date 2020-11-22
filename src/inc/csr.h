@@ -16,7 +16,6 @@
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
 #pragma once
-#include "util.h"
 
 #ifndef __ASSEMBLER__
 /*** CSR functions for C ***/
@@ -105,15 +104,6 @@
 #define CSR_PMPCFG5 0x3A5
 #define CSR_PMPCFG6 0x3A6
 #define CSR_PMPCFG7 0x3A7
-/* pmpcfg8-pmpcfg15 for RV32 */
-#define CSR_PMPCFG8 0x3A8
-#define CSR_PMPCFG9 0x3A9
-#define CSR_PMPCFG10 0x3AA
-#define CSR_PMPCFG11 0x3AB
-#define CSR_PMPCFG12 0x3AC
-#define CSR_PMPCFG13 0x3AD
-#define CSR_PMPCFG14 0x3AE
-#define CSR_PMPCFG15 0x3AF
 
 #define CSR_PMPADDR0 0x3B0
 #define CSR_PMPADDR1 0x3B1

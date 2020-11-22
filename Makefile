@@ -1,36 +1,44 @@
-# Source and header directories
-SRC_DIR	= src
-HDR_DIR = src/inc
+# This file is part of KongligSK.
+# Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
+# 
+# KongligSK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# KongligSK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
 
 # Configuration file
 CONFIG		?= example/config.yaml
 # Linker script
 LDS		?= example/konglig.lds
 # Build directory
-BUILD_DIR 	?= build
-OBJ_DIR		?= $(BUILD_DIR)/obj
-DA_DIR		?= $(BUILD_DIR)/da
-ELF_DIR		?= $(BUILD_DIR)/elf
-BUILD_DIRS	= $(OBJ_DIR) $(DA_DIR) $(ELF_DIR)
+BUILD 		?= build
 # RISC-V Toolchain prefix
 RISCV_PREFIX	?= riscv64-unknown-elf-
 
-# Configuration header
-CONFIG_HDR	= $(HDR_DIR)/config.h
-# ELF path
-ELF		= $(ELF_DIR)/konglig.elf
+# Source and header directories
+SRC_DIR	= src
+HDR_DIR = src/inc
 
-# Source files, C and assembly
-C_SRCS	+= $(wildcard $(SRC_DIR)/*.c) 
-S_SRCS	+= $(wildcard $(SRC_DIR)/*.S)
+# Source files
+SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*.S)
+HDRS = $(wildcard $(HDR_DIR)/*.h)
 # Object files
-C_OBJS	= $(patsubst $(SRC_DIR)/%, $(OBJ_DIR)/%.o, $(C_SRCS))
-S_OBJS	= $(patsubst $(SRC_DIR)/%, $(OBJ_DIR)/%.o, $(S_SRCS))
-OBJS    = $(C_OBJS) $(S_OBJS)
-HDRS	+= $(wildcard $(HDR_DIR)/*.h) $(CONFIG_HDR)
-# Disassembly files (objdump)
-DAS	= $(patsubst $(OBJ_DIR)/%.o, $(DA_DIR)/%.da, $(OBJS)) \
-	  $(patsubst $(ELF_DIR)/%.elf, $(DA_DIR)/%.elf.da, $(ELF))
+OBJS = $(patsubst $(SRC_DIR)/%, $(BUILD)/%.o, $(SRCS))
+# Dependency files
+DEPS = $(patsubst $(SRC_DIR)/%, $(BUILD)/%.d, $(SRCS))
+
+# ELF file 
+ELF = $(BUILD)/konglig.elf
+# Configuration header
+CONFIG_H = $(HDR_DIR)/config.h
 
 # Toolchain
 CC	= $(RISCV_PREFIX)gcc
@@ -47,43 +55,33 @@ CFLAGS	+= -fno-stack-protector -fno-asynchronous-unwind-tables
 CFLAGS	+= -Wstrict-prototypes -Wmissing-prototypes 
 CFLAGS	+= -Wmissing-declarations
 CFLAGS	+= -Wundef -Wpointer-arith -ffreestanding
-CFLAGS	+= -fno-pic
-#CFLAGS	+= -fstack-usage
 CFLAGS	+= -std=gnu11
 CFLAGS	+= -O2 -g
 # Assembly (gcc) flags
 SFLAGS	+= -I$(HDR_DIR)
 SFLAGS	+= -D__ASSEMBLER__
 SFLAGS	+= -mabi=lp64 -march=rv64imac
-SFLAGS	+= -fno-pic
 SFLAGS	+= -g
 # Linker (ld) flags
 LDFLAGS += -nostdlib -T$(LDS)
-LDFLAGS += --relax
-
+LDFLAGS += --relax -O2
 
 .PHONY: all
-all: config elf disassembly
+all: config elf
 
 .PHONY: clean
 clean: 
-	rm -f $(DAS) $(ELF) $(OBJS) $(CONFIG_HDR)
+	rm -fr $(BUILD) $(CONFIG_H)
 
 .PHONY: config
-config: $(CONFIG_HDR)
+config: $(CONFIG_H)
 
 .PHONY: elf
 elf: $(ELF)
 
-.PHONY: disassembly 
-disassembly: $(DAS)
-
-.PHONY: da 
-da: $(DAS)
-
 .PHONY: format
 format:
-	clang-format -i --style=WebKit $(SRC_DIR)/*.c $(HDR_DIR)/*.h
+	clang-format -i $(SRC_DIR)/*.c $(HDR_DIR)/*.h
 
 .PHONY: size
 size: $(ELF) $(OBJS)
@@ -91,31 +89,30 @@ size: $(ELF) $(OBJS)
 
 .PHONY: cloc 
 cloc:
-	cloc $(HDRS) $(C_SRCS) $(S_SRCS)
-
-$(BUILD_DIRS):
-	@mkdir -p $@
-
-$(OBJ_DIR)/%.c.o: $(SRC_DIR)/%.c $(HDRS) | $(OBJ_DIR) 
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJ_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS) | $(OBJ_DIR) 
-	$(CC) $(SFLAGS) -c $< -o $@
-
-$(DA_DIR)/%.da: $(OBJ_DIR)/%.o | $(DA_DIR)
-	$(OBJDUMP) -d $< > $@
-
-$(DA_DIR)/%.elf.da: $(ELF_DIR)/%.elf | $(DA_DIR) 
-	$(OBJDUMP) -d $< > $@
+	cloc $(HDRS) $(SRCS)
 
 # Format the file if we have clang-format
 ifeq (,$(shell which clang-format))
-$(CONFIG_HDR): $(CONFIG)
-	tools/config.py $(CONFIG) > $(CONFIG_HDR)
+$(CONFIG_H): $(CONFIG)
+	tools/config.py $< > $@
 else
-$(CONFIG_HDR): $(CONFIG)
-	tools/config.py $(CONFIG) | clang-format --style=WebKit > $(CONFIG_HDR)
+$(CONFIG_H): $(CONFIG)
+	tools/config.py $< | clang-format > $@
 endif
 
-$(ELF_DIR)/%.elf: $(OBJS) $(LDS) | $(ELF_DIR)
+$(BUILD):
+	@mkdir -p $@
+
+$(BUILD)/%.c.o: $(SRC_DIR)/%.c | $(BUILD)
+	$(CC) $(CFLAGS) -MMD -c $< -o $@
+	$(OBJDUMP) -d $@ > $@.da
+
+$(BUILD)/%.S.o: $(SRC_DIR)/%.S | $(BUILD)
+	$(CC) $(SFLAGS) -MMD -c $< -o $@
+	$(OBJDUMP) -d $@ > $@.da
+
+$(BUILD)/%.elf: $(OBJS) $(LDS) | $(BUILD)
 	$(LD) $(LDFLAGS) $(OBJS) -o $@
+	$(OBJDUMP) -d $@ > $@.da
+
+-include $(DEPS)

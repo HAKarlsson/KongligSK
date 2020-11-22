@@ -1,17 +1,17 @@
-/* 
+/*
  * This file is part of KongligSK.
  * Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
- * 
+ *
  * KongligSK is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * KongligSK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -21,12 +21,12 @@
 .extern __global_pointer$
 .extern __stack_top
 
-.global trap_entry 
-.global trap_exit 
+.global trap_entry
+.global trap_exit
 
 .section .text.mentry
 
-/** TrapEntry(void) 
+/** TrapEntry(void)
  * On a user-mode trap, we come to the trap entry.
  * The trap entry must do the following:
  * - Save user context to the PCB.
@@ -34,7 +34,7 @@
  * - Load kernel registers.
  * - Call the kernel body which handles the actual trap.
  */
-.align 4 
+.align 4
 trap_entry:
     /* Swap tp, with PCB pointer. */
     csrrw   tp, mscratch, tp /* tp -> proc, mscratch -> user tp */
@@ -63,7 +63,7 @@ trap_entry:
     csrr    t0, mepc
     csrrw   t1, mscratch, zero
     sd      t0, PCB_PC(tp)
-    sd	    t1, PCB_TP(tp)	    
+    sd	    t1, PCB_TP(tp)
     sd      gp, PCB_GP(tp)
 
 
@@ -75,13 +75,13 @@ trap_entry:
     la      sp, __stack_top
 
     /* Call trap_handler(proc, mcause, mtval) */
-    mv	    a0, tp	/* a0 -> proc */ 
+    mv	    a0, tp	/* a0 -> proc */
     csrr    a1, mcause  /* a1 -> mcause */
     csrr    a2, mtval   /* a2 -> mtval */
     call    trap_handler
 
     /* a0 -> new_proc, tp -> old_proc */
-    /* If new_proc == old_proc, skip. */ 
+    /* If new_proc == old_proc, skip. */
     beq	    a0,  tp, __restore_proc
 
 /* Save old proc. */
@@ -144,7 +144,7 @@ __restore_proc:
     /* Load pc, tp, gp. */
     ld	    t0, PCB_PC(a0)
     csrw    mepc, t0
-    ld	    tp, PCB_TP(a0)    
+    ld	    tp, PCB_TP(a0)
     ld      gp, PCB_GP(a0)
 
     /* Load callee saved registers. */

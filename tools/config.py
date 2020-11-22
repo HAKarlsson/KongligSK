@@ -1,4 +1,4 @@
-#!/bin/env python3    
+#!/bin/env python3
 # This file is part of KongligSK.
 # Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
 #
@@ -18,9 +18,10 @@
 import argparse
 import yaml
 
+
 def get_args():
     parser = argparse.ArgumentParser(
-        description = 'Generate KongligSK configuration header (config.h).')
+        description='Generate KongligSK configuration header (config.h).')
     parser.add_argument('conf_file', help='Path to YAML configuration file.')
     return parser.parse_args()
 
@@ -35,12 +36,16 @@ def get_config_data(conf_file):
 def mk_struct(d, indentlevel=1):
     indent = "\t" * indentlevel
     if isinstance(d, list) or isinstance(d, map):
-        s = f", \\\n{indent}".join(mk_struct(v, indentlevel=indentlevel) for v in d)
-        return f"{{ \\\n{s} \\\n}}" 
+        s = f", \\\n{indent}".join(
+            mk_struct(v, indentlevel=indentlevel) for v in d)
+        return f"{{ \\\n{s} \\\n}}"
     if isinstance(d, dict):
-        s = f", \\\n{indent}".join(f".{k} = {mk_struct(v,indentlevel=indentlevel+1)}" for k, v in d.items())
-        return f"{{ \\\n{indent}{s} \\\n{indent}}}" 
+        s = f", \\\n{indent}".join(
+            f".{k} = {mk_struct(v,indentlevel=indentlevel+1)}" for k,
+            v in d.items())
+        return f"{{ \\\n{indent}{s} \\\n{indent}}}"
     return f"0x{d:02x}"
+
 
 def mk_header(defines):
     lines = list()
@@ -48,6 +53,7 @@ def mk_header(defines):
     lines.append("#pragma once")
     lines.extend(f"#define {k} {v}" for k, v in defines.items())
     return '\n'.join(lines)
+
 
 def mk_pmp(proc_id, pmp_confs):
     pmp = dict()
@@ -72,15 +78,16 @@ def mk_pmp(proc_id, pmp_confs):
             na_mask = 0
         else:
             cfg |= 3 << 3
-            na_mask = int("1"*lg_size, 2)
+            na_mask = int("1" * lg_size, 2)
             na_mask >>= 3
             assert (base % (2**lg_size) == 0), \
                 (f"process {proc_id+1}, pmp {i+1}: base (0x{base:x}) must "
                  f"be a multiple of 2^lg_size (0x{2**lg_size:x}).")
-        
+
         pmp['cfg0'] |= (cfg << (8 * i))
         pmp[f'addr{i}'] = base >> 2 | na_mask
     return pmp
+
 
 def mk_defines(data):
     defines = data['constants']
@@ -91,7 +98,6 @@ def mk_defines(data):
     defines['__PROCS__'] = mk_struct(procs)
     defines['NR_PROCS'] = len(procs)
     return defines
-
 
 
 if __name__ == "__main__":
