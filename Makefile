@@ -96,16 +96,16 @@ cloc:
 $(BUILD_DIRS):
 	@mkdir -p $@
 
-$(OBJ_DIR)/%.c.o: $(SRC_DIR)/%.c $(HDRS) $(OBJ_DIR) 
+$(OBJ_DIR)/%.c.o: $(SRC_DIR)/%.c $(HDRS) | $(OBJ_DIR) 
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS) $(OBJ_DIR) 
+$(OBJ_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS) | $(OBJ_DIR) 
 	$(CC) $(SFLAGS) -c $< -o $@
 
-$(DA_DIR)/%.da: $(OBJ_DIR)/%.o $(DA_DIR)
+$(DA_DIR)/%.da: $(OBJ_DIR)/%.o | $(DA_DIR)
 	$(OBJDUMP) -d $< > $@
 
-$(DA_DIR)/%.elf.da: $(ELF_DIR)/%.elf $(DA_DIR) 
+$(DA_DIR)/%.elf.da: $(ELF_DIR)/%.elf | $(DA_DIR) 
 	$(OBJDUMP) -d $< > $@
 
 # Format the file if we have clang-format
@@ -117,5 +117,5 @@ $(CONFIG_HDR): $(CONFIG)
 	tools/config.py $(CONFIG) | clang-format --style=WebKit > $(CONFIG_HDR)
 endif
 
-$(ELF_DIR)/%.elf: $(OBJS) $(LDS) $(ELF_DIR)
+$(ELF_DIR)/%.elf: $(OBJS) $(LDS) | $(ELF_DIR)
 	$(LD) $(LDFLAGS) $(OBJS) -o $@
