@@ -22,11 +22,6 @@
 
 typedef unsigned long uintptr_t;
 
-typedef struct inbox {
-    uintptr_t full;
-    uintptr_t msgs[2];
-} Inbox;
-
 /* General purpose registers */
 typedef struct regs {
     uintptr_t pc;
@@ -89,15 +84,11 @@ typedef struct pmp {
 } pmp_t;
 
 /* Process control block */
-typedef struct process {
+typedef struct proc {
     regs_t regs;
     pmp_t pmp;
     ut_regs_t ut_regs;
     /* Process id */
     uintptr_t id;
-} Process;
-
-void InitCPU(void);
-void InitKernel(void);
-extern Process processes[NR_PROCS];
-extern Inbox inboxes[NR_PROCS][NR_PROCS];
+} proc_t;
+extern proc_t procs[NR_PROCS];

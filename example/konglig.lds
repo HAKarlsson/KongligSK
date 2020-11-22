@@ -27,8 +27,10 @@ SECTIONS {
     PROVIDE (__stack_size = 0x100);
 
     .text : {
-        KEEP(*(.init))
+        KEEP(*(.text.init))
+        KEEP(*(.text.mentry))
         *(.text)
+        *(.text.*)
     }
 
     .data : ALIGN(8) {

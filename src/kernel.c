@@ -19,17 +19,4 @@
 
 #include "csr.h"
 #include "traps.h"
-Process processes[NR_PROCS] = __PROCS__;
-Inbox inboxes[NR_PROCS][NR_PROCS];
-
-#pragma weak InitCPU
-void InitCPU(void)
-{ /* Set CPU frequency and so on. */
-}
-
-void InitKernel(void)
-{
-    CSRWI(CSR_MSTATUS, 0);
-    CSRW(CSR_MTVEC, TrapEntry);
-    InitCPU();
-}
+proc_t procs[NR_PROCS] = __PROCS__;

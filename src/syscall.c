@@ -15,37 +15,42 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "syscall.h"
+#include "traps.h"
 
 #include "csr.h"
 #include "inst_code.h"
 #include "kernel.h"
-#include "user_trap.h"
-#include "util.h"
 
-typedef Process* (*Handler)(Process*);
-Process* ksk_YieldTo(Process* proc);
-Process* ksk_Send(Process* proc);
-Process* ksk_Recv(Process* proc);
+typedef struct inbox {
+    uintptr_t full;
+    uintptr_t msgs[2];
+} inbox_t;
 
-static const Handler syscall_handlers[] = {
-    [0] = ksk_YieldTo,
-    [1] = ksk_Send,
-    [2] = ksk_Recv,
+inbox_t inboxes[NR_PROCS][NR_PROCS];
+
+typedef proc_t* (*handler_t)(proc_t*);
+proc_t* ksk_yield(proc_t* proc);
+proc_t* ksk_send(proc_t* proc);
+proc_t* ksk_recv(proc_t* proc);
+
+static const handler_t syscall_handlers[] = {
+    [0] = ksk_yield,
+    [1] = ksk_send,
+    [2] = ksk_recv,
 };
 
-Process* HandleSyscall(Process* proc, uintptr_t mcause, uintptr_t mtval)
+proc_t* handle_syscall(proc_t* proc, uintptr_t mcause, uintptr_t mtval)
 {
-    uintptr_t syscall_number = proc->regs.t0;
-    if (syscall_number < ARRAY_SIZE(syscall_handlers)) {
+    uintptr_t syscall_nr = proc->regs.t0;
+    if (syscall_nr < ARRAY_SIZE(syscall_handlers)) {
         proc->regs.pc += 4;
-        return syscall_handlers[syscall_number](proc);
+        return syscall_handlers[syscall_nr](proc);
     }
-    return HandleUserException(proc, MCAUSE_EXCPT_ILLEGAL_INSTRUCTION,
+    return handle_uexcpt(proc, MCAUSE_EXCPT_ILLEGAL_INSTRUCTION,
         INST_ECALL);
 }
 
-Process* ksk_YieldTo(Process* proc)
+proc_t* ksk_yield(proc_t* proc)
 {
     uintptr_t target = proc->regs.a0;
     /* If the target process is invalid, just return the current process. */
@@ -55,14 +60,14 @@ Process* ksk_YieldTo(Process* proc)
     }
     /* Return the target process. */
     proc->regs.a0 = 1;
-    return &processes[target];
+    return &procs[target];
 }
 
-Process* ksk_Send(Process* proc)
+proc_t* ksk_send(proc_t* proc)
 {
     uintptr_t sender = proc->id;
     uintptr_t receiver = proc->regs.a0;
-    Inbox* inbox = &inboxes[receiver][sender];
+    inbox_t* inbox = &inboxes[receiver][sender];
     /* We must check receiver first, otherwise the inbox check is invalid! */
     if (receiver >= NR_PROCS || inbox->full) {
         // maybe do exception for bad receiver??
@@ -76,11 +81,11 @@ Process* ksk_Send(Process* proc)
     return proc;
 }
 
-Process* ksk_Recv(Process* proc)
+proc_t* ksk_recv(proc_t* proc)
 {
     uintptr_t sender = proc->regs.a0;
     uintptr_t receiver = proc->id;
-    Inbox* inbox = &inboxes[receiver][sender];
+    inbox_t* inbox = &inboxes[receiver][sender];
     /* We must check sender first, otherwise the inbox check is invalid! */
     if (sender >= NR_PROCS || !inbox->full) {
         // maybe do exception for bad sender??

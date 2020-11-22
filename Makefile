@@ -1,5 +1,3 @@
-
-
 # Source and header directories
 SRC_DIR	= src
 HDR_DIR = src/inc
@@ -10,9 +8,10 @@ CONFIG		?= example/config.yaml
 LDS		?= example/konglig.lds
 # Build directory
 BUILD_DIR 	?= build
-OBJ_DIR		?= $(BUILD_DIR)
-DA_DIR		?= $(BUILD_DIR)
-ELF_DIR		?= $(BUILD_DIR)
+OBJ_DIR		?= $(BUILD_DIR)/obj
+DA_DIR		?= $(BUILD_DIR)/da
+ELF_DIR		?= $(BUILD_DIR)/elf
+BUILD_DIRS	= $(OBJ_DIR) $(DA_DIR) $(ELF_DIR)
 # RISC-V Toolchain prefix
 RISCV_PREFIX	?= riscv64-unknown-elf-
 
@@ -49,7 +48,7 @@ CFLAGS	+= -Wstrict-prototypes -Wmissing-prototypes
 CFLAGS	+= -Wmissing-declarations
 CFLAGS	+= -Wundef -Wpointer-arith -ffreestanding
 CFLAGS	+= -fno-pic
-CFLAGS	+= -fstack-usage
+#CFLAGS	+= -fstack-usage
 CFLAGS	+= -std=gnu11
 CFLAGS	+= -O2 -g
 # Assembly (gcc) flags
@@ -64,12 +63,11 @@ LDFLAGS += --relax
 
 
 .PHONY: all
-all: $(BUILD_DIR) config elf disassembly
+all: config elf disassembly
 
 .PHONY: clean
 clean: 
-	rm -f $(DAS) $(OBJS) $(CONFIG_HDR)
-	rm -rf $(BUILD_DIR)
+	rm -f $(DAS) $(ELF) $(OBJS) $(CONFIG_HDR)
 
 .PHONY: config
 config: $(CONFIG_HDR)
@@ -88,26 +86,26 @@ format:
 	clang-format -i --style=WebKit $(SRC_DIR)/*.c $(HDR_DIR)/*.h
 
 .PHONY: size
-size: $(OBJS) $(ELF)
+size: $(ELF) $(OBJS)
 	$(SIZE) $(OBJS) $(ELF)
 
 .PHONY: cloc 
 cloc:
 	cloc $(HDRS) $(C_SRCS) $(S_SRCS)
 
-$(BUILD_DIR):
-	@mkdir -p $(BUILD_DIR)
+$(BUILD_DIRS):
+	@mkdir -p $@
 
-$(OBJ_DIR)/%.c.o: $(SRC_DIR)/%.c $(HDRS)
+$(OBJ_DIR)/%.c.o: $(SRC_DIR)/%.c $(HDRS) $(OBJ_DIR) 
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS)
+$(OBJ_DIR)/%.S.o: $(SRC_DIR)/%.S $(HDRS) $(OBJ_DIR) 
 	$(CC) $(SFLAGS) -c $< -o $@
 
-$(DA_DIR)/%.da: $(OBJ_DIR)/%.o 
+$(DA_DIR)/%.da: $(OBJ_DIR)/%.o $(DA_DIR)
 	$(OBJDUMP) -d $< > $@
 
-$(DA_DIR)/%.elf.da: $(ELF_DIR)/%.elf
+$(DA_DIR)/%.elf.da: $(ELF_DIR)/%.elf $(DA_DIR) 
 	$(OBJDUMP) -d $< > $@
 
 # Format the file if we have clang-format
@@ -119,5 +117,5 @@ $(CONFIG_HDR): $(CONFIG)
 	tools/config.py $(CONFIG) | clang-format --style=WebKit > $(CONFIG_HDR)
 endif
 
-$(ELF_DIR)/%.elf: $(OBJS) $(LDS)
+$(ELF_DIR)/%.elf: $(OBJS) $(LDS) $(ELF_DIR)
 	$(LD) $(LDFLAGS) $(OBJS) -o $@

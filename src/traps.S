@@ -21,8 +21,10 @@
 .extern __global_pointer$
 .extern __stack_top
 
-.global TrapEntry
-.global TrapExit 
+.global trap_entry 
+.global trap_exit 
+
+.section .text.mentry
 
 /** TrapEntry(void) 
  * On a user-mode trap, we come to the trap entry.
@@ -33,109 +35,128 @@
  * - Call the kernel body which handles the actual trap.
  */
 .align 4 
-TrapEntry:
-    /* Save user a0, and load pointer to PCB. */
-    csrrw   a0, mscratch, a0
+trap_entry:
+    /* Swap tp, with PCB pointer. */
+    csrrw   tp, mscratch, tp /* tp -> proc, mscratch -> user tp */
+    beqz    tp, __hang
 
-    /* Save user context to PCB. */
-    sd	    ra, PCB_RA(a0) 
-    sd      sp, PCB_SP(a0)  
-    sd      gp, PCB_GP(a0)  
-    sd      tp, PCB_TP(a0)  
-    sd      t0, PCB_T0(a0)  
-    sd      t1, PCB_T1(a0)  
+    /* Save callee saved register. */
+    sd	    ra, PCB_RA(tp)
+    sd	    sp, PCB_SP(tp)
+    sd      t0, PCB_T0(tp)
+    sd      t1, PCB_T1(tp)
+    sd	    t2, PCB_T2(tp)
+    sd      t3, PCB_T3(tp)
+    sd      t4, PCB_T4(tp)
+    sd      t5, PCB_T5(tp)
+    sd      t6, PCB_T6(tp)
+    sd      a1, PCB_A1(tp)
+    sd      a2, PCB_A2(tp)
+    sd	    a3, PCB_A3(tp)
+    sd      a4, PCB_A4(tp)
+    sd      a5, PCB_A5(tp)
+    sd      a6, PCB_A6(tp)
+    sd      a7, PCB_A7(tp)
+    sd      a0, PCB_A0(tp)
 
-    /* Load user a0 and pc. */
-    csrr    t0, mscratch    
-    csrr    t1, mepc 
+    /* Save pc, tp, gp. */
+    csrr    t0, mepc
+    csrrw   t1, mscratch, zero
+    sd      t0, PCB_PC(tp)
+    sd	    t1, PCB_TP(tp)	    
+    sd      gp, PCB_GP(tp)
 
-    sd	    t2, PCB_T2(a0)  
-    sd      s0, PCB_S0(a0)  
-    sd      s1, PCB_S1(a0)  
-    sd      a1, PCB_A1(a0)  
-    sd      a2, PCB_A2(a0)  
 
-    /* Load trap handling registers. */
-    csrr    a1, mcause 
-    csrr    a2, mtval 
-
-    sd	    a3, PCB_A3(a0)  
-    sd      a4, PCB_A4(a0)  
-    sd      a5, PCB_A5(a0)  
-    sd      a6, PCB_A6(a0)  
-    sd      a7, PCB_A7(a0)  
-    sd      s2, PCB_S2(a0)  
-    sd      s3, PCB_S3(a0)  
-    sd      s4, PCB_S4(a0)  
-    sd      s5, PCB_S5(a0)  
-    sd      s6, PCB_S6(a0)  
-    sd      s7, PCB_S7(a0)  
-    sd      s8, PCB_S8(a0)  
-    sd      s9, PCB_S9(a0)  
-    sd      s10, PCB_S10(a0) 
-    sd      s11, PCB_S11(a0) 
-    sd      t3, PCB_T3(a0)  
-    sd      t4, PCB_T4(a0)  
-    sd      t5, PCB_T5(a0)  
-    sd      t6, PCB_T6(a0)  
-
-    /* Save user a0 and pc. */
-    sd	    t0, PCB_A0(a0)
-    sd      t1, PCB_PC(a0)
-
-    /* Load kernel gp, sp, and fp. */
-    .option push
-    .option norelax
+    /* Load kernel gp, sp. */
+.option push
+.option norelax
     la      gp, __global_pointer$
-    .option pop
-#if __stack_size > 0
+.option pop
     la      sp, __stack_top
-    mv      fp, sp 
-#endif
-    mv	    s0, a0
 
-    call    TrapHandler 
+    /* Call trap_handler(proc, mcause, mtval) */
+    mv	    a0, tp	/* a0 -> proc */ 
+    csrr    a1, mcause  /* a1 -> mcause */
+    csrr    a2, mtval   /* a2 -> mtval */
+    call    trap_handler
 
-TrapExit:
-    beq	    a0, s0, _skip_pmp
-    /* Load PMP settings from memory first. */
-    /* We only want to use callee saved regs. */
-    ld	    t0, PCB_PMPCFG0(a0)
-    ld      t2, PCB_PMPADDR0(a0)
-    ld      a1, PCB_PMPADDR1(a0)
-    ld      a2, PCB_PMPADDR2(a0)
-    ld      a3, PCB_PMPADDR3(a0)
-    ld      a4, PCB_PMPADDR4(a0)
-    ld      a5, PCB_PMPADDR5(a0)
-    ld      a6, PCB_PMPADDR6(a0)
-    ld      a7, PCB_PMPADDR7(a0)
-    /* Here comes the pipeline flush!!! :/ */
-    /* Write to PMP registers. */
-    csrw    pmpcfg0, t0
-    csrw    pmpaddr0, t2
-    csrw    pmpaddr1, a1
-    csrw    pmpaddr2, a2
-    csrw    pmpaddr3, a3
-    csrw    pmpaddr4, a4
-    csrw    pmpaddr5, a5
-    csrw    pmpaddr6, a6
-    csrw    pmpaddr7, a7
-_skip_pmp:
+    /* a0 -> new_proc, tp -> old_proc */
+    /* If new_proc == old_proc, skip. */ 
+    beq	    a0,  tp, __restore_proc
 
-    /* We store a pointer to the PCB in MSCRATCH. */
-    csrw    mscratch, a0
-    /* Load user context from PCB. */
+/* Save old proc. */
+__save_old:
+    /* Save saved registers. */
+    sd      s0,   PCB_S0(tp)
+    sd      s1,   PCB_S1(tp)
+    sd      s2,   PCB_S2(tp)
+    sd      s3,   PCB_S3(tp)
+    sd      s4,   PCB_S4(tp)
+    sd      s5,   PCB_S5(tp)
+    sd      s6,   PCB_S6(tp)
+    sd      s7,   PCB_S7(tp)
+    sd      s8,   PCB_S8(tp)
+    sd      s9,   PCB_S9(tp)
+    sd      s10, PCB_S10(tp)
+    sd      s11, PCB_S11(tp)
+
+/* Load new proc. */
+__load_new:
+trap_exit: /* a0 -> new_proc */
+    /* Set up new PMP. */
+    ld	    s0,  PCB_PMPCFG0(a0)
+    ld      s1, PCB_PMPADDR0(a0)
+    ld      s2, PCB_PMPADDR1(a0)
+    ld      s3, PCB_PMPADDR2(a0)
+    ld      s4, PCB_PMPADDR3(a0)
+    ld      s5, PCB_PMPADDR4(a0)
+    ld      s6, PCB_PMPADDR5(a0)
+    ld      s7, PCB_PMPADDR6(a0)
+    ld      s8, PCB_PMPADDR7(a0)
+    csrw    pmpcfg0,  s0
+    csrw    pmpaddr0, s1
+    csrw    pmpaddr1, s2
+    csrw    pmpaddr2, s3
+    csrw    pmpaddr3, s4
+    csrw    pmpaddr4, s5
+    csrw    pmpaddr5, s6
+    csrw    pmpaddr6, s7
+    csrw    pmpaddr7, s8
+
+    /* Load saved registers. */
+    ld      s0,   PCB_S0(a0)
+    ld      s1,   PCB_S1(a0)
+    ld      s2,   PCB_S2(a0)
+    ld      s3,   PCB_S3(a0)
+    ld      s4,   PCB_S4(a0)
+    ld      s5,   PCB_S5(a0)
+    ld      s6,   PCB_S6(a0)
+    ld      s7,   PCB_S7(a0)
+    ld      s8,   PCB_S8(a0)
+    ld      s9,   PCB_S9(a0)
+    ld      s10, PCB_S10(a0)
+    ld      s11, PCB_S11(a0)
+
+/* Load pc, tp, gp and callee saved registers. */
+__restore_proc:
+    csrw    mscratch, a0 /* mscratch -> new_proc */
+
+    /* Load pc, tp, gp. */
     ld	    t0, PCB_PC(a0)
+    csrw    mepc, t0
+    ld	    tp, PCB_TP(a0)    
+    ld      gp, PCB_GP(a0)
+
+    /* Load callee saved registers. */
     ld      ra, PCB_RA(a0)
     ld      sp, PCB_SP(a0)
-    ld      gp, PCB_GP(a0)
-    ld      tp, PCB_TP(a0)
-    csrw    mepc, t0
     ld	    t0, PCB_T0(a0)
     ld      t1, PCB_T1(a0)
     ld      t2, PCB_T2(a0)
-    ld      s0, PCB_S0(a0)
-    ld      s1, PCB_S1(a0)
+    ld      t3, PCB_T3(a0)
+    ld      t4, PCB_T4(a0)
+    ld      t5, PCB_T5(a0)
+    ld      t6, PCB_T6(a0)
     ld      a1, PCB_A1(a0)
     ld      a2, PCB_A2(a0)
     ld      a3, PCB_A3(a0)
@@ -143,20 +164,13 @@ _skip_pmp:
     ld      a5, PCB_A5(a0)
     ld      a6, PCB_A6(a0)
     ld      a7, PCB_A7(a0)
-    ld      s2, PCB_S2(a0)
-    ld      s3, PCB_S3(a0)
-    ld      s4, PCB_S4(a0)
-    ld      s5, PCB_S5(a0)
-    ld      s6, PCB_S6(a0)
-    ld      s7, PCB_S7(a0)
-    ld      s8, PCB_S8(a0)
-    ld      s9, PCB_S9(a0)
-    ld      s10, PCB_S10(a0)
-    ld      s11, PCB_S11(a0)
-    ld      t3, PCB_T3(a0)
-    ld      t4, PCB_T4(a0)
-    ld      t5, PCB_T5(a0)
-    ld      t6, PCB_T6(a0)
     ld      a0, PCB_A0(a0)
     /* Return to user context. */
     mret
+
+__hang:
+    csrr    t0, mepc
+    csrr    t1, mcause
+    csrr    t2, mtval
+    ebreak
+    j       __hang

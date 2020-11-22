@@ -1,2 +1,0 @@
-src/kernel.c:26:6:InitCPU	0	static
-src/kernel.c:30:6:InitKernel	0	static

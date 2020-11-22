@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-#include "kernel.h"
+#include "traps.h"
 
-Process* HandleSyscall(Process* proc, uintptr_t mcause, uintptr_t mtval);
+proc_t* handle_mtimer(proc_t* proc, uintptr_t mcause, uintptr_t mtval)
+{
+    return proc;
+}

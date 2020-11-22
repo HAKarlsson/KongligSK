@@ -22,8 +22,22 @@
  * Handles an exception for the proc, using mcause to determine the
  * exception type. mtval is the auxiliary information for the trap.
  */
-Process* TrapHandler(Process* proc, uintptr_t mcause, uintptr_t mtval);
+proc_t* trap_handler(proc_t* proc, uintptr_t mcause, uintptr_t mtval);
 
-void TrapEntry(void) NO_RETURN;
-void TrapExit(Process* proc) NO_RETURN;
-void TrapExitWithPMP(Process* proc) NO_RETURN;
+void trap_entry(void) NO_RETURN;
+void trap_exit(proc_t* proc) NO_RETURN;
+
+proc_t* handle_mtimer(proc_t* proc, uintptr_t mcause, uintptr_t mtval);
+proc_t* handle_syscall(proc_t* proc, uintptr_t mcause, uintptr_t mtval);
+
+/**
+ * Delegate an exception to proc.
+ * mcause and mtval holds the exception type and auxiliary information.
+ */
+proc_t* handle_uexcpt(proc_t* proc, uintptr_t mcause, uintptr_t mtval);
+
+/**
+ * Delegate an interrupt to proc.
+ * mcause holds the interrupt type.
+ */
+proc_t* handle_uintrp(proc_t* proc, uintptr_t mcause, uintptr_t mtval);

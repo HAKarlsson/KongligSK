@@ -21,9 +21,11 @@
 .global _start
 .extern __global_pointer$
 .extern __stack_top
-.extern kernel_init
+.extern procs
+.extern trap_entry
+.extern trap_exit 
 
-.section .init
+.section .text.init
 _start:
     /* disable interrupts */
     csrwi   CSR_MIE, 0
@@ -33,14 +35,9 @@ _start:
 .option norelax
     la      gp, __global_pointer$
 .option pop
-#if __stack_size > 0
     la      sp, __stack_top
-    mv      fp, sp
-#endif
-
-    call    InitKernel 
-    tail    TrapExit
-
-hang:
-    ebreak
-    j       hang
+    la	    t0, trap_entry
+    csrw    mtvec, t0
+    csrw    mstatus, zero
+    la	    a0, procs
+    tail    trap_exit

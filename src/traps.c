@@ -18,24 +18,21 @@
 #include "traps.h"
 
 #include "csr.h"
-#include "machine_timer.h"
-#include "syscall.h"
-#include "user_trap.h"
 #include "util.h"
 
-typedef Process* (*Handler)(Process* pcb, uintptr_t mcause, uintptr_t mtval);
+typedef proc_t* (*handler_t)(proc_t* pcb, uintptr_t mcause, uintptr_t mtval);
 
-static const Handler handlers[] = {
+static const handler_t handlers[] = {
     /* Execeptions */
-    [MCAUSE_EXCPT_INSTRUCTION_ADDRESS_MISALIGNED] = HandleUserException,
-    [MCAUSE_EXCPT_INSTRUCTION_ACCESS_FAULT] = HandleUserException,
+    [MCAUSE_EXCPT_INSTRUCTION_ADDRESS_MISALIGNED] = handle_uexcpt,
+    [MCAUSE_EXCPT_INSTRUCTION_ACCESS_FAULT] = handle_uexcpt,
     [MCAUSE_EXCPT_ILLEGAL_INSTRUCTION] = 0,
-    [MCAUSE_EXCPT_BREAKPOINT] = HandleUserException,
-    [MCAUSE_EXCPT_LOAD_ADDRESS_MISALIGNED] = HandleUserException,
-    [MCAUSE_EXCPT_LOAD_ACCESS_FAULT] = HandleUserException,
-    [MCAUSE_EXCPT_STORE_ADDRESS_MISALIGNED] = HandleUserException,
-    [MCAUSE_EXCPT_STORE_ACCESS_FAULT] = HandleUserException,
-    [MCAUSE_EXCPT_USER_ECALL] = HandleSyscall,
+    [MCAUSE_EXCPT_BREAKPOINT] = handle_uexcpt,
+    [MCAUSE_EXCPT_LOAD_ADDRESS_MISALIGNED] = handle_uexcpt,
+    [MCAUSE_EXCPT_LOAD_ACCESS_FAULT] = handle_uexcpt,
+    [MCAUSE_EXCPT_STORE_ADDRESS_MISALIGNED] = handle_uexcpt,
+    [MCAUSE_EXCPT_STORE_ACCESS_FAULT] = handle_uexcpt,
+    [MCAUSE_EXCPT_USER_ECALL] = handle_syscall,
     [MCAUSE_EXCPT_SUPERVISOR_ECALL] = 0,
     [MCAUSE_EXCPT_MACHINE_ECALL] = 0,
     [MCAUSE_EXCPT_INSTRUCTION_PAGE_FAULT] = 0,
@@ -43,11 +40,11 @@ static const Handler handlers[] = {
     [MCAUSE_EXCPT_STORE_PAGE_FAULT] = 0,
     /* Interrupts */
     [MCAUSE_INTRP_MACHINE_SOFTWARE | 0x10] = 0,
-    [MCAUSE_INTRP_MACHINE_TIMER | 0x10] = HandleMachineTimer,
-    [MCAUSE_INTRP_MACHINE_EXTERN | 0x10] = 0,
+    [MCAUSE_INTRP_MACHINE_TIMER | 0x10] = handle_mtimer,
+    [MCAUSE_INTRP_MACHINE_EXTERN | 0x10] = handle_uintrp,
 };
 
-Process* TrapHandler(Process* pcb, uintptr_t mcause, uintptr_t mtval)
+proc_t* trap_handler(proc_t* pcb, uintptr_t mcause, uintptr_t mtval)
 {
     // If mcause is interrupt, this should be 0x10 (16), otherwise 0.
     uintptr_t intrp_bit = (mcause >> 63) << 4;
