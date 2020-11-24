@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "kernel.h"
-
-#include "csr.h"
-#include "traps.h"
-proc_t procs[NR_PROCS] = __PROCS__;
+#pragma once
+#include "part.h"
+#include "types.h"
+part_t* handle_mtimer(part_t* part, uintptr_t mcause, uintptr_t mtval);

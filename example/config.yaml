@@ -8,7 +8,7 @@ constants:
     MTIMECMP: 0x2004000UL
 
 
-# Process configurations
+# Partition configurations
 # regs: Initial register values
 #   pc: Initial program counter
 #   ...
@@ -16,7 +16,7 @@ constants:
 #   rwx:     Read, write and execute permissions.
 #   base:    Base address of memory region, must be aligned with 2^lsize.
 #   lg_size: log_2(Size of memory region).
-processes:
+partitions:
     - regs.pc: 0x20100000
       pmp:
           - {rwx: rx, base: 0x20100000, lg_size: 20}

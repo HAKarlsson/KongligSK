@@ -18,9 +18,12 @@
 #include "traps.h"
 
 #include "csr.h"
+#include "sched.h"
+#include "syscall.h"
 #include "util.h"
+#include "utraps.h"
 
-typedef proc_t* (*handler_t)(proc_t* pcb, uintptr_t mcause, uintptr_t mtval);
+typedef part_t* (*handler_t)(part_t* pcb, uintptr_t mcause, uintptr_t mtval);
 
 static const handler_t handlers[] = {
     /* Execeptions */
@@ -44,9 +47,9 @@ static const handler_t handlers[] = {
     [MCAUSE_INTRP_MACHINE_EXTERN | 0x10] = handle_uintrp,
 };
 
-proc_t* trap_handler(proc_t* pcb, uintptr_t mcause, uintptr_t mtval)
+part_t* trap_handler(part_t* pcb, uintptr_t mcause, uintptr_t mtval)
 {
     // If mcause is interrupt, this should be 0x10 (16), otherwise 0.
-    uintptr_t intrp_bit = (mcause >> 63) << 4;
+    uintptr_t intrp_bit = (mcause >> (REGBITS - 1)) << 4;
     return handlers[mcause | intrp_bit](pcb, mcause, mtval);
 }

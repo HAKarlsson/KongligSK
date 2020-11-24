@@ -19,52 +19,34 @@
 #include "pcb_offset.h"
 
 .extern __global_pointer$
-.extern __stack_top
+.extern handle_trap
 
 .global trap_entry
 .global trap_exit
 
-.section .text.mentry
-
-/** TrapEntry(void)
- * On a user-mode trap, we come to the trap entry.
- * The trap entry must do the following:
- * - Save user context to the PCB.
- * - Load trap handling registers.
- * - Load kernel registers.
- * - Call the kernel body which handles the actual trap.
- */
+.section .text.traps
 .align 4
 trap_entry:
-    /* Swap tp, with PCB pointer. */
-    csrrw   tp, mscratch, tp /* tp -> proc, mscratch -> user tp */
-    beqz    tp, __hang
+    /* Swap tp, with partition pointer. */
+    csrrw   tp, mscratch, tp
+    /* Save ra, sp, gp, a0-a7. */
+    SREG    ra, PCB_RA(tp)
+    SREG    sp, PCB_SP(tp)
+    SREG    gp, PCB_GP(tp)
+    SREG    a0, PCB_A0(tp)
+    SREG    a1, PCB_A1(tp)
+    SREG    a2, PCB_A2(tp)
+    SREG    a3, PCB_A3(tp)
+    SREG    a4, PCB_A4(tp)
+    SREG    a5, PCB_A5(tp)
+    SREG    a6, PCB_A6(tp)
+    SREG    a7, PCB_A7(tp)
 
-    /* Save callee saved register. */
-    sd	    ra, PCB_RA(tp)
-    sd	    sp, PCB_SP(tp)
-    sd      t0, PCB_T0(tp)
-    sd      t1, PCB_T1(tp)
-    sd	    t2, PCB_T2(tp)
-    sd      t3, PCB_T3(tp)
-    sd      t4, PCB_T4(tp)
-    sd      t5, PCB_T5(tp)
-    sd      t6, PCB_T6(tp)
-    sd      a1, PCB_A1(tp)
-    sd      a2, PCB_A2(tp)
-    sd	    a3, PCB_A3(tp)
-    sd      a4, PCB_A4(tp)
-    sd      a5, PCB_A5(tp)
-    sd      a6, PCB_A6(tp)
-    sd      a7, PCB_A7(tp)
-    sd      a0, PCB_A0(tp)
-
-    /* Save pc, tp, gp. */
-    csrr    t0, mepc
-    csrrw   t1, mscratch, zero
-    sd      t0, PCB_PC(tp)
-    sd	    t1, PCB_TP(tp)
-    sd      gp, PCB_GP(tp)
+    /* Save pc, tp. */
+    csrr    a0, mepc
+    csrr    a1, mscratch
+    SREG    a0, PCB_PC(tp)
+    SREG    a1, PCB_TP(tp)
 
 
     /* Load kernel gp, sp. */
@@ -72,105 +54,105 @@ trap_entry:
 .option norelax
     la      gp, __global_pointer$
 .option pop
-    la      sp, __stack_top
+    la      sp, __stack_pointer$
 
-    /* Call trap_handler(proc, mcause, mtval) */
-    mv	    a0, tp	/* a0 -> proc */
+    /* trap_handler(part, mcause, mtval) */
+    mv      a0, tp      /* a0 -> part */
     csrr    a1, mcause  /* a1 -> mcause */
     csrr    a2, mtval   /* a2 -> mtval */
     call    trap_handler
 
-    /* a0 -> new_proc, tp -> old_proc */
-    /* If new_proc == old_proc, skip. */
-    beq	    a0,  tp, __restore_proc
+    /* a0 -> new_part, tp -> old_part */
+    /* If new_part == old_part, skip. */
+    beq     a0, tp, __restore
 
-/* Save old proc. */
-__save_old:
-    /* Save saved registers. */
-    sd      s0,   PCB_S0(tp)
-    sd      s1,   PCB_S1(tp)
-    sd      s2,   PCB_S2(tp)
-    sd      s3,   PCB_S3(tp)
-    sd      s4,   PCB_S4(tp)
-    sd      s5,   PCB_S5(tp)
-    sd      s6,   PCB_S6(tp)
-    sd      s7,   PCB_S7(tp)
-    sd      s8,   PCB_S8(tp)
-    sd      s9,   PCB_S9(tp)
-    sd      s10, PCB_S10(tp)
-    sd      s11, PCB_S11(tp)
+    /* Save s0-s11, t0-t6. */
+    SREG    s0,   PCB_S0(tp)
+    SREG    s1,   PCB_S1(tp)
+    SREG    s2,   PCB_S2(tp)
+    SREG    s3,   PCB_S3(tp)
+    SREG    s4,   PCB_S4(tp)
+    SREG    s5,   PCB_S5(tp)
+    SREG    s6,   PCB_S6(tp)
+    SREG    s7,   PCB_S7(tp)
+    SREG    s8,   PCB_S8(tp)
+    SREG    s9,   PCB_S9(tp)
+    SREG    s10, PCB_S10(tp)
+    SREG    s11, PCB_S11(tp)
+    SREG    t0,   PCB_T0(tp)
+    SREG    t1,   PCB_T1(tp)
+    SREG    t2,   PCB_T2(tp)
+    SREG    t3,   PCB_T3(tp)
+    SREG    t4,   PCB_T4(tp)
+    SREG    t5,   PCB_T5(tp)
+    SREG    t6,   PCB_T6(tp)
 
-/* Load new proc. */
-__load_new:
-trap_exit: /* a0 -> new_proc */
+trap_exit:
     /* Set up new PMP. */
-    ld	    s0,  PCB_PMPCFG0(a0)
-    ld      s1, PCB_PMPADDR0(a0)
-    ld      s2, PCB_PMPADDR1(a0)
-    ld      s3, PCB_PMPADDR2(a0)
-    ld      s4, PCB_PMPADDR3(a0)
-    ld      s5, PCB_PMPADDR4(a0)
-    ld      s6, PCB_PMPADDR5(a0)
-    ld      s7, PCB_PMPADDR6(a0)
-    ld      s8, PCB_PMPADDR7(a0)
-    csrw    pmpcfg0,  s0
-    csrw    pmpaddr0, s1
-    csrw    pmpaddr1, s2
-    csrw    pmpaddr2, s3
-    csrw    pmpaddr3, s4
-    csrw    pmpaddr4, s5
-    csrw    pmpaddr5, s6
-    csrw    pmpaddr6, s7
-    csrw    pmpaddr7, s8
+    LREG    s0, PCB_PMPADDR0(a0)
+    LREG    s1, PCB_PMPADDR1(a0)
+    LREG    s2, PCB_PMPADDR2(a0)
+    LREG    s3, PCB_PMPADDR3(a0)
+    LREG    s4, PCB_PMPADDR4(a0)
+    LREG    s5, PCB_PMPADDR5(a0)
+    LREG    s6, PCB_PMPADDR6(a0)
+    LREG    s7, PCB_PMPADDR7(a0)
+    LREG    s8,  PCB_PMPCFG0(a0)
+#ifdef RV32
+    LREG    s9,  PCB_PMPCFG1(a0)
+#endif
+    csrw    pmpaddr0, s0
+    csrw    pmpaddr1, s1
+    csrw    pmpaddr2, s2
+    csrw    pmpaddr3, s3
+    csrw    pmpaddr4, s4
+    csrw    pmpaddr5, s5
+    csrw    pmpaddr6, s6
+    csrw    pmpaddr7, s7
+    csrw    pmpcfg0,  s8
+#ifdef RV32
+    csrw    pmpcfg1, s9
+#endif
+    /* Load s0-s11, t0-t6. */
+    LREG    s0,   PCB_S0(a0)
+    LREG    s1,   PCB_S1(a0)
+    LREG    s2,   PCB_S2(a0)
+    LREG    s3,   PCB_S3(a0)
+    LREG    s4,   PCB_S4(a0)
+    LREG    s5,   PCB_S5(a0)
+    LREG    s6,   PCB_S6(a0)
+    LREG    s7,   PCB_S7(a0)
+    LREG    s8,   PCB_S8(a0)
+    LREG    s9,   PCB_S9(a0)
+    LREG    s10, PCB_S10(a0)
+    LREG    s11, PCB_S11(a0)
+    LREG    t0,   PCB_T0(a0)
+    LREG    t1,   PCB_T1(a0)
+    LREG    t2,   PCB_T2(a0)
+    LREG    t3,   PCB_T3(a0)
+    LREG    t4,   PCB_T4(a0)
+    LREG    t5,   PCB_T5(a0)
+    LREG    t6,   PCB_T6(a0)
 
-    /* Load saved registers. */
-    ld      s0,   PCB_S0(a0)
-    ld      s1,   PCB_S1(a0)
-    ld      s2,   PCB_S2(a0)
-    ld      s3,   PCB_S3(a0)
-    ld      s4,   PCB_S4(a0)
-    ld      s5,   PCB_S5(a0)
-    ld      s6,   PCB_S6(a0)
-    ld      s7,   PCB_S7(a0)
-    ld      s8,   PCB_S8(a0)
-    ld      s9,   PCB_S9(a0)
-    ld      s10, PCB_S10(a0)
-    ld      s11, PCB_S11(a0)
-
-/* Load pc, tp, gp and callee saved registers. */
-__restore_proc:
-    csrw    mscratch, a0 /* mscratch -> new_proc */
-
-    /* Load pc, tp, gp. */
-    ld	    t0, PCB_PC(a0)
+/* Load pc, tp, ra, sp, gp, a0-a7. */
+__restore:
+    /* mscratch -> new_part */
+    csrw    mscratch, a0
+    /* Load pc, tp. */
+    LREG    t0, PCB_PC(a0)
     csrw    mepc, t0
-    ld	    tp, PCB_TP(a0)
-    ld      gp, PCB_GP(a0)
-
-    /* Load callee saved registers. */
-    ld      ra, PCB_RA(a0)
-    ld      sp, PCB_SP(a0)
-    ld	    t0, PCB_T0(a0)
-    ld      t1, PCB_T1(a0)
-    ld      t2, PCB_T2(a0)
-    ld      t3, PCB_T3(a0)
-    ld      t4, PCB_T4(a0)
-    ld      t5, PCB_T5(a0)
-    ld      t6, PCB_T6(a0)
-    ld      a1, PCB_A1(a0)
-    ld      a2, PCB_A2(a0)
-    ld      a3, PCB_A3(a0)
-    ld      a4, PCB_A4(a0)
-    ld      a5, PCB_A5(a0)
-    ld      a6, PCB_A6(a0)
-    ld      a7, PCB_A7(a0)
-    ld      a0, PCB_A0(a0)
+    LREG    tp, PCB_TP(a0)
+    /* Load ra, sp, gp, a0-a7. */
+    LREG    ra, PCB_RA(a0)
+    LREG    sp, PCB_SP(a0)
+    LREG    gp, PCB_GP(a0)
+    LREG    a1, PCB_A1(a0)
+    LREG    a2, PCB_A2(a0)
+    LREG    a3, PCB_A3(a0)
+    LREG    a4, PCB_A4(a0)
+    LREG    a5, PCB_A5(a0)
+    LREG    a6, PCB_A6(a0)
+    LREG    a7, PCB_A7(a0)
+    LREG    a0, PCB_A0(a0)
     /* Return to user context. */
     mret
-
-__hang:
-    csrr    t0, mepc
-    csrr    t1, mcause
-    csrr    t2, mtval
-    ebreak
-    j       __hang

@@ -15,32 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "traps.h"
+#include "utraps.h"
 
-proc_t* handle_uexcpt(proc_t* proc, uintptr_t mcause, uintptr_t mtval)
+part_t* handle_uexcpt(part_t* part, uintptr_t mcause, uintptr_t mtval)
 {
     /* Save user pc. */
-    proc->ut_regs.uepc = proc->regs.pc;
+    part->ut_regs.uepc = part->regs.pc;
     /* Save trap information. */
-    proc->ut_regs.ucause = mcause;
-    proc->ut_regs.utval = mtval;
+    part->ut_regs.ucause = mcause;
+    part->ut_regs.utval = mtval;
     /* Disable interrupts and set UPIE if UIE */
-    proc->ut_regs.ustatus = (proc->ut_regs.ustatus & 1) << 4;
+    part->ut_regs.ustatus = (part->ut_regs.ustatus & 1) << 4;
     /* User jumps to trap handler. */
-    proc->regs.pc = proc->ut_regs.utvec & ~3UL;
-    return proc;
+    part->regs.pc = part->ut_regs.utvec & ~3UL;
+    return part;
 }
 
-proc_t* handle_uintrp(proc_t* proc, uintptr_t mcause, uintptr_t mtval)
+part_t* handle_uintrp(part_t* part, uintptr_t mcause, uintptr_t mtval)
 {
     /* Save user pc. */
-    proc->ut_regs.uepc = proc->regs.pc;
+    part->ut_regs.uepc = part->regs.pc;
     /* Save trap information. */
-    proc->ut_regs.ucause = mcause;
-    proc->ut_regs.utval = mtval;
+    part->ut_regs.ucause = mcause;
+    part->ut_regs.utval = mtval;
     /* Disable interrupts and set UPIE if UIE */
-    proc->ut_regs.ustatus = (proc->ut_regs.ustatus & 1) << 4;
+    part->ut_regs.ustatus = (part->ut_regs.ustatus & 1) << 4;
     /* User jumps to trap handler. */
-    proc->regs.pc = proc->ut_regs.utvec & ~3UL;
-    return proc;
+    part->regs.pc = part->ut_regs.utvec & ~3UL;
+    /* Add offset if vectored mode. */
+    if (part->ut_regs.utvec & 1)
+	part->regs.pc += (mcause << 2);
+    return part;
 }

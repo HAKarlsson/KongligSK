@@ -18,9 +18,7 @@
 #pragma once
 
 #include "config.h"
-#include "util.h"
-
-typedef unsigned long uintptr_t;
+#include "types.h"
 
 /* General purpose registers */
 typedef struct regs {
@@ -72,7 +70,6 @@ typedef struct ut_regs {
 
 /* Physical memory protection registers */
 typedef struct pmp {
-    uintptr_t cfg0;
     uintptr_t addr0;
     uintptr_t addr1;
     uintptr_t addr2;
@@ -81,14 +78,15 @@ typedef struct pmp {
     uintptr_t addr5;
     uintptr_t addr6;
     uintptr_t addr7;
+    uint64_t cfg; // pmpcfg0 + pmpcfg1
 } pmp_t;
 
-/* Process control block */
-typedef struct proc {
+/* Partition control block */
+typedef struct part {
     regs_t regs;
     pmp_t pmp;
     ut_regs_t ut_regs;
-    /* Process id */
+    /* Partition id */
     uintptr_t id;
-} proc_t;
-extern proc_t procs[NR_PROCS];
+} part_t;
+extern part_t parts[NR_PARTS];

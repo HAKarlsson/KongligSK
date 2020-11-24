@@ -55,15 +55,15 @@ def mk_header(defines):
     return '\n'.join(lines)
 
 
-def mk_pmp(proc_id, pmp_confs):
+def mk_pmp(part_id, pmp_confs):
     pmp = dict()
-    pmp['cfg0'] = 0
+    pmp['cfg'] = 0
     for i, pmp_conf in enumerate(pmp_confs):
         rwx = pmp_conf['rwx']
         base = pmp_conf['base']
         lg_size = pmp_conf['lg_size']
         assert (lg_size > 1), \
-            f"process {proc_id+1}, pmp {i+1}: lg_size must be greater than 1."
+            f"partition {part_id+1}, pmp {i+1}: lg_size must be greater than 1."
 
         cfg = 0
         if "r" in rwx:
@@ -81,22 +81,22 @@ def mk_pmp(proc_id, pmp_confs):
             na_mask = int("1" * lg_size, 2)
             na_mask >>= 3
             assert (base % (2**lg_size) == 0), \
-                (f"process {proc_id+1}, pmp {i+1}: base (0x{base:x}) must "
+                (f"partition {part_id+1}, pmp {i+1}: base (0x{base:x}) must "
                  f"be a multiple of 2^lg_size (0x{2**lg_size:x}).")
 
-        pmp['cfg0'] |= (cfg << (8 * i))
+        pmp['cfg'] |= (cfg << (8 * i))
         pmp[f'addr{i}'] = base >> 2 | na_mask
     return pmp
 
 
 def mk_defines(data):
     defines = data['constants']
-    procs = data['processes']
-    for i, proc in enumerate(procs):
-        proc['id'] = i
-        proc['pmp'] = mk_pmp(i, proc['pmp'])
-    defines['__PROCS__'] = mk_struct(procs)
-    defines['NR_PROCS'] = len(procs)
+    parts = data['partitions']
+    for i, part in enumerate(parts):
+        part['id'] = i
+        part['pmp'] = mk_pmp(i, part['pmp'])
+    defines['__PARTS_CONFIG__'] = mk_struct(parts)
+    defines['NR_PARTS'] = len(parts)
     return defines
 
 

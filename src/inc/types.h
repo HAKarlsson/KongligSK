@@ -15,9 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "traps.h"
-
-proc_t* handle_mtimer(proc_t* proc, uintptr_t mcause, uintptr_t mtval)
-{
-    return proc;
-}
+#pragma once
+typedef unsigned long uintptr_t;
+typedef unsigned int uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned long long uint64_t;

@@ -15,86 +15,85 @@
  * You should have received a copy of the GNU General Public License
  * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "traps.h"
+#include "syscall.h"
 
 #include "csr.h"
+#include "util.h"
 #include "inst_code.h"
-#include "kernel.h"
+#include "utraps.h"
 
+#define NR_MSGS 4
 typedef struct inbox {
     uintptr_t full;
-    uintptr_t msgs[2];
+    uintptr_t msgs[NR_MSGS];
 } inbox_t;
+static inbox_t inboxes[NR_PARTS][NR_PARTS];
 
-inbox_t inboxes[NR_PROCS][NR_PROCS];
+static part_t* ksk_yield(part_t* part) __attribute((noinline));
+static part_t* ksk_send(part_t* part) __attribute((noinline));
+static part_t* ksk_recv(part_t* part) __attribute((noinline));
 
-typedef proc_t* (*handler_t)(proc_t*);
-proc_t* ksk_yield(proc_t* proc);
-proc_t* ksk_send(proc_t* proc);
-proc_t* ksk_recv(proc_t* proc);
+typedef part_t* (*handler_t)(part_t* part);
+static const handler_t handlers[] = { ksk_yield, ksk_send, ksk_recv };
 
-static const handler_t syscall_handlers[] = {
-    [0] = ksk_yield,
-    [1] = ksk_send,
-    [2] = ksk_recv,
-};
-
-proc_t* handle_syscall(proc_t* proc, uintptr_t mcause, uintptr_t mtval)
+part_t* handle_syscall(part_t* part, uintptr_t mcause, uintptr_t mtval)
 {
-    uintptr_t syscall_nr = proc->regs.t0;
-    if (syscall_nr < ARRAY_SIZE(syscall_handlers)) {
-        proc->regs.pc += 4;
-        return syscall_handlers[syscall_nr](proc);
-    }
-    return handle_uexcpt(proc, MCAUSE_EXCPT_ILLEGAL_INSTRUCTION,
-        INST_ECALL);
+    uintptr_t syscall_nr = part->regs.a7;
+    if (syscall_nr < ARRAY_SIZE(handlers))
+        return handlers[syscall_nr](part);
+    return handle_uexcpt(part, MCAUSE_EXCPT_ILLEGAL_INSTRUCTION, INST_ECALL);
 }
 
-proc_t* ksk_yield(proc_t* proc)
+part_t* ksk_yield(part_t* part)
 {
-    uintptr_t target = proc->regs.a0;
-    /* If the target process is invalid, just return the current process. */
-    if (target >= NR_PROCS) {
-        proc->regs.a0 = 0;
-        return proc;
+    part->regs.pc += 4;
+    uintptr_t target = part->regs.a0;
+    /* If the target partess is invalid, just return the current partess. */
+    if (target >= NR_PARTS) {
+        part->regs.a0 = 0;
+        return part;
     }
-    /* Return the target process. */
-    proc->regs.a0 = 1;
-    return &procs[target];
+    /* Return the target partess. */
+    part->regs.a0 = 1;
+    return &parts[target];
 }
 
-proc_t* ksk_send(proc_t* proc)
+part_t* ksk_send(part_t* part)
 {
-    uintptr_t sender = proc->id;
-    uintptr_t receiver = proc->regs.a0;
+    part->regs.pc += 4;
+    uintptr_t sender = part->id;
+    uintptr_t receiver = part->regs.a0;
     inbox_t* inbox = &inboxes[receiver][sender];
     /* We must check receiver first, otherwise the inbox check is invalid! */
-    if (receiver >= NR_PROCS || inbox->full) {
+    if (receiver >= NR_PARTS || inbox->full) {
         // maybe do exception for bad receiver??
-        proc->regs.a0 = -1;
-        return proc;
+        part->regs.a0 = -1;
+        return part;
     }
     /* Copy the message from regs.ster to inbox, then mark inbox as full. */
-    inbox->msgs[0] = proc->regs.a2;
-    inbox->msgs[1] = proc->regs.a3;
+    uintptr_t* msgs = &(part->regs.a2);
+    for (int i = 0; i < NR_MSGS; ++i)
+        inbox->msgs[i] = msgs[i];
     inbox->full = 1;
-    return proc;
+    return part;
 }
 
-proc_t* ksk_recv(proc_t* proc)
+part_t* ksk_recv(part_t* part)
 {
-    uintptr_t sender = proc->regs.a0;
-    uintptr_t receiver = proc->id;
+    part->regs.pc += 4;
+    uintptr_t sender = part->regs.a0;
+    uintptr_t receiver = part->id;
     inbox_t* inbox = &inboxes[receiver][sender];
     /* We must check sender first, otherwise the inbox check is invalid! */
-    if (sender >= NR_PROCS || !inbox->full) {
+    if (sender >= NR_PARTS || !inbox->full) {
         // maybe do exception for bad sender??
-        proc->regs.a0 = -1;
-        return proc;
+        part->regs.a0 = -1;
+        return part;
     }
-    /* Copy the message from inbox to regs.ster, then mark inbox as empty. */
-    proc->regs.a2 = inbox->msgs[0];
-    proc->regs.a3 = inbox->msgs[1];
+    /* Copy the message from inbox to register, then mark inbox as empty. */
+    uintptr_t* msgs = &(part->regs.a2);
+    for (int i = 0; i < NR_MSGS; ++i)
+        msgs[i] = inbox->msgs[i];
     inbox->full = 0;
-    return proc;
+    return part;
 }
