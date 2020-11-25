@@ -20,6 +20,7 @@
 .extern __global_pointer$
 .extern __stack_pointer$
 .extern init_kernel 
+.extern trap_entry
 
 .section .text.init
 _start:
@@ -32,4 +33,7 @@ _start:
     la      gp, __global_pointer$
 .option pop
     la	    sp, __stack_pointer$
+    la	    a0, trap_entry
+    csrw    mtvec, a0
+    csrwi   mstatus, 0
     tail    init_kernel

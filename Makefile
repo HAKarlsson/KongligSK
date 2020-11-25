@@ -87,7 +87,7 @@ elf: $(ELF)
 
 .PHONY: format
 format:
-	clang-format -i $(SRC_DIR)/*.c $(HDR_DIR)/*.h
+	clang-format -i $(SRC_DIR)/*.c $(HDR_DIR)/*.h api/*.h
 
 .PHONY: size
 size: $(ELF) $(OBJS)

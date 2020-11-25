@@ -2,18 +2,21 @@
  * This file is part of KongligSK.
  * Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
  *
- * KongligSK is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * KongligSK is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your
+ * option) any later version.
  *
- * KongligSK is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * KongligSK is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public
+ * License along with KongligSK.  If not, see
+ * <https://www.gnu.org/licenses/>.
  */
 #include "traps.h"
 
@@ -23,7 +26,7 @@
 #include "util.h"
 #include "utraps.h"
 
-typedef part_t* (*handler_t)(part_t* pcb, uintptr_t mcause, uintptr_t mtval);
+typedef part_t* (*handler_t)(part_t* pcb, word_t mcause, word_t mtval);
 
 static const handler_t handlers[] = {
     /* Execeptions */
@@ -47,9 +50,10 @@ static const handler_t handlers[] = {
     [MCAUSE_INTRP_MACHINE_EXTERN | 0x10] = handle_uintrp,
 };
 
-part_t* trap_handler(part_t* pcb, uintptr_t mcause, uintptr_t mtval)
+part_t* trap_handler(part_t* part, word_t mcause, word_t mtval)
 {
-    // If mcause is interrupt, this should be 0x10 (16), otherwise 0.
-    uintptr_t intrp_bit = (mcause >> (REGBITS - 1)) << 4;
-    return handlers[mcause | intrp_bit](pcb, mcause, mtval);
+    // If mcause is interrupt, this should be 0x10 (16),
+    // otherwise 0.
+    word_t intrp_bit = (mcause >> (REGBITS - 1)) << 4;
+    return handlers[mcause | intrp_bit](part, mcause, mtval);
 }

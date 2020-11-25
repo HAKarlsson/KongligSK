@@ -2,58 +2,47 @@
  * This file is part of KongligSK.
  * Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
  *
- * KongligSK is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * KongligSK is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your
+ * option) any later version.
  *
- * KongligSK is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * KongligSK is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public
+ * License along with KongligSK.  If not, see
+ * <https://www.gnu.org/licenses/>.
  */
 #pragma once
 
 #ifndef __ASSEMBLER__
 /*** CSR functions for C ***/
 /* Base instructions */
-#define CSRRW(rd, csr_num, rs) \
-    __asm__("csrrw %0, %1, %2" \
-            : "=r"(rd)         \
-            : "I"(csr_num), "r"(rs))
+#define CSRRW(rd, csr_num, rs)                                                \
+    __asm__("csrrw %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
 
-#define CSRRS(rd, csr_num, rs) \
-    __asm__("csrrs %0, %1, %2" \
-            : "=r"(rd)         \
-            : "I"(csr_num), "r"(rs))
+#define CSRRS(rd, csr_num, rs)                                                \
+    __asm__("csrrs %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
 
-#define CSRRC(rd, csr_num, rs) \
-    __asm__("csrrc %0, %1, %2" \
-            : "=r"(rd)         \
-            : "I"(csr_num), "r"(rs))
+#define CSRRC(rd, csr_num, rs)                                                \
+    __asm__("csrrc %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
 
-#define CSRRWI(rd, csr_num, imm) \
-    __asm__("csrrwi %0, %1, %2"  \
-            : "=r"(rd)           \
-            : "I"(csr_num), "I"(imm))
+#define CSRRWI(rd, csr_num, imm)                                              \
+    __asm__("csrrwi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
 
-#define CSRRSI(rd, csr_num, imm) \
-    __asm__("csrrsi %0, %1, %2"  \
-            : "=r"(rd)           \
-            : "I"(csr_num), "I"(imm))
+#define CSRRSI(rd, csr_num, imm)                                              \
+    __asm__("csrrsi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
 
-#define CSRRCI(rd, csr_num, imm) \
-    __asm__("csrrci %0, %1, %2"  \
-            : "=r"(rd)           \
-            : "I"(csr_num), "I"(imm))
+#define CSRRCI(rd, csr_num, imm)                                              \
+    __asm__("csrrci %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
 
 /* Pseudo CSR instructions */
-#define CSRR(rd, csr_num) __asm__("csrrs %0, %1, x0" \
-                                  : "=r"(rd)         \
-                                  : "I"(csr_num))
+#define CSRR(rd, csr_num) __asm__("csrrs %0, %1, x0" : "=r"(rd) : "I"(csr_num))
 
 #define CSRW(csr_num, rs) __asm__("csrrw x0, %0, %1" ::"I"(csr_num), "r"(rs))
 
@@ -61,13 +50,13 @@
 
 #define CSRC(csr_num, rs) __asm__("csrrs x0, %0, %1" ::"I"(csr_num), "r"(rs))
 
-#define CSRWI(csr_num, imm) \
+#define CSRWI(csr_num, imm)                                                   \
     __asm__("csrrwi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
-#define CSRSI(csr_num, imm) \
+#define CSRSI(csr_num, imm)                                                   \
     __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
-#define CSRCI(csr_num, imm) \
+#define CSRCI(csr_num, imm)                                                   \
     __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
 
 #endif /* __ASSEMBLER__ */
@@ -93,17 +82,9 @@
 #define CSR_MCAUSE 0x342
 #define CSR_MTVAL 0x343
 #define CSR_MIP 0x344
-#define CSR_MTINST 0x34A
-#define CSR_MTVAL2 0x34B
 /* Machine Memory Protection */
 #define CSR_PMPCFG0 0x3A0
 #define CSR_PMPCFG1 0x3A1
-#define CSR_PMPCFG2 0x3A2
-#define CSR_PMPCFG3 0x3A3
-#define CSR_PMPCFG4 0x3A4
-#define CSR_PMPCFG5 0x3A5
-#define CSR_PMPCFG6 0x3A6
-#define CSR_PMPCFG7 0x3A7
 
 #define CSR_PMPADDR0 0x3B0
 #define CSR_PMPADDR1 0x3B1
@@ -113,62 +94,6 @@
 #define CSR_PMPADDR5 0x3B5
 #define CSR_PMPADDR6 0x3B6
 #define CSR_PMPADDR7 0x3B7
-#define CSR_PMPADDR8 0x3B8
-#define CSR_PMPADDR9 0x3B9
-#define CSR_PMPADDR10 0x3BA
-#define CSR_PMPADDR11 0x3BB
-#define CSR_PMPADDR12 0x3BC
-#define CSR_PMPADDR13 0x3BD
-#define CSR_PMPADDR14 0x3BE
-#define CSR_PMPADDR15 0x3BF
-#define CSR_PMPADDR16 0x3C0
-#define CSR_PMPADDR17 0x3C1
-#define CSR_PMPADDR18 0x3C2
-#define CSR_PMPADDR19 0x3C3
-#define CSR_PMPADDR20 0x3C4
-#define CSR_PMPADDR21 0x3C5
-#define CSR_PMPADDR22 0x3C6
-#define CSR_PMPADDR23 0x3C7
-#define CSR_PMPADDR24 0x3C8
-#define CSR_PMPADDR25 0x3C9
-#define CSR_PMPADDR26 0x3CA
-#define CSR_PMPADDR27 0x3CB
-#define CSR_PMPADDR28 0x3CC
-#define CSR_PMPADDR29 0x3CD
-#define CSR_PMPADDR30 0x3CE
-#define CSR_PMPADDR31 0x3CF
-#define CSR_PMPADDR32 0x3D0
-#define CSR_PMPADDR33 0x3D1
-#define CSR_PMPADDR34 0x3D2
-#define CSR_PMPADDR35 0x3D3
-#define CSR_PMPADDR36 0x3D4
-#define CSR_PMPADDR37 0x3D5
-#define CSR_PMPADDR38 0x3D6
-#define CSR_PMPADDR39 0x3D7
-#define CSR_PMPADDR40 0x3D8
-#define CSR_PMPADDR41 0x3D9
-#define CSR_PMPADDR42 0x3DA
-#define CSR_PMPADDR43 0x3DB
-#define CSR_PMPADDR44 0x3DC
-#define CSR_PMPADDR45 0x3DD
-#define CSR_PMPADDR46 0x3DE
-#define CSR_PMPADDR47 0x3DF
-#define CSR_PMPADDR48 0x3E0
-#define CSR_PMPADDR49 0x3E1
-#define CSR_PMPADDR50 0x3E2
-#define CSR_PMPADDR51 0x3E3
-#define CSR_PMPADDR52 0x3E4
-#define CSR_PMPADDR53 0x3E5
-#define CSR_PMPADDR54 0x3E6
-#define CSR_PMPADDR55 0x3E7
-#define CSR_PMPADDR56 0x3E8
-#define CSR_PMPADDR57 0x3E9
-#define CSR_PMPADDR58 0x3EA
-#define CSR_PMPADDR59 0x3EB
-#define CSR_PMPADDR60 0x3EC
-#define CSR_PMPADDR61 0x3ED
-#define CSR_PMPADDR62 0x3EE
-#define CSR_PMPADDR63 0x3EF
 /* Machine Counter/Timers */
 #define CSR_MCYCLE 0xB00
 #define CSR_MINSTRET 0xB02
