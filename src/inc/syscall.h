@@ -20,4 +20,4 @@
  */
 #pragma once
 #include "part.h"
-part_t* handle_syscall(part_t* part, word_t mcause, word_t mtval);
+void handle_syscall(word_t mcause, word_t mtval);

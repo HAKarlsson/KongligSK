@@ -22,14 +22,8 @@
 #include "part.h"
 
 /**
- * Delegate an exception to partition.
- * mcause and mtval holds the exception type and auxiliary
+ * Delegate a trap to partition.
+ * mcause and mtval holds the trap type and auxiliary
  * information.
  */
-part_t* handle_uexcpt(part_t* part, word_t mcause, word_t mtval);
-
-/**
- * Delegate an interrupt to partition.
- * mcause holds the interrupt type.
- */
-part_t* handle_uintrp(part_t* part, word_t mcause, word_t mtval);
+void handle_utrap(word_t mcause, word_t mtval);

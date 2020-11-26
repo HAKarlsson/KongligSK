@@ -23,4 +23,8 @@
 #include "part.h"
 #include "traps.h"
 
-void init_kernel(void) { trap_exit(&parts[0]); }
+void init_kernel(void)
+{
+    curr_part = &parts[0];
+    trap_exit();
+}

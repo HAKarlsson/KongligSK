@@ -25,10 +25,9 @@
 // static inline uint64_t read_mtime(void);
 // static inline uint64_t write_mtimecmp(void);
 
-part_t* handle_mtimer(part_t* part, word_t mcause, word_t mtval)
+void handle_mtimer(word_t mcause, word_t mtval)
 {
-    save_regs(part);
-    set_pmp(part);
-    load_regs(part);
-    return part;
+    save_regs(curr_part);
+    set_pmp(curr_part);
+    load_regs(curr_part);
 }

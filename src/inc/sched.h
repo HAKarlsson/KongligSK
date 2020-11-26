@@ -20,4 +20,4 @@
  */
 #pragma once
 #include "part.h"
-part_t* handle_mtimer(part_t* part, word_t mcause, word_t mtval);
+void handle_mtimer(word_t mcause, word_t mtval);

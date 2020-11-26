@@ -26,26 +26,20 @@
 .section .text.traps
 .align 4
 trap_entry:
-    /* Swap tp, with partition pointer. */
-    csrrw   a0, mscratch, a0 
+    /* swap user tp with partition pointer */
+    csrrw   tp, mscratch, tp 
     /* Save ra, sp, gp, a0-a7. */
-    SREG    ra,  (1 * REGBYTES)(a0)
-    SREG    sp,  (2 * REGBYTES)(a0)
-    SREG    gp,  (3 * REGBYTES)(a0)
-    SREG    a1, (11 * REGBYTES)(a0)
-    SREG    a2, (12 * REGBYTES)(a0)
-    SREG    a3, (13 * REGBYTES)(a0)
-    SREG    a4, (14 * REGBYTES)(a0)
-    SREG    a5, (15 * REGBYTES)(a0)
-    SREG    a6, (16 * REGBYTES)(a0)
-    SREG    a7, (17 * REGBYTES)(a0)
-
-    /* Save pc, a0. */
-    csrr    a1, mepc
-    csrr    a2, mscratch
-    SREG    a1,  (0 * REGBYTES)(a0)
-    SREG    a2,  (10 * REGBYTES)(a0)
-
+    SREG    ra,  (1 * REGBYTES)(tp)
+    SREG    sp,  (2 * REGBYTES)(tp)
+    SREG    gp,  (3 * REGBYTES)(tp)
+    SREG    a0, (10 * REGBYTES)(tp)
+    SREG    a1, (11 * REGBYTES)(tp)
+    SREG    a2, (12 * REGBYTES)(tp)
+    SREG    a3, (13 * REGBYTES)(tp)
+    SREG    a4, (14 * REGBYTES)(tp)
+    SREG    a5, (15 * REGBYTES)(tp)
+    SREG    a6, (16 * REGBYTES)(tp)
+    SREG    a7, (17 * REGBYTES)(tp)
 
     /* Load kernel gp, sp. */
 .option push
@@ -54,30 +48,26 @@ trap_entry:
 .option pop
     la      sp, __stack_pointer$
 
-    csrr    a1, mcause  /* a1 -> mcause */
-    csrr    a2, mtval   /* a2 -> mtval */
+    csrr    a0, mcause  /* a0 -> mcause */
+    csrr    a1, mtval   /* a1 -> mtval */
 
-    /* trap_handler(part, mcause, mtval) */
+    /* trap_handler(mcause, mtval) */
     call    trap_handler
 
 trap_exit:
-    /* mscratch -> new_part */
-    csrw    mscratch, a0
-    /* Load pc. */
-    LREG    a0,  (0 * REGBYTES)(a0)
-    csrw    mepc, a0
     /* Load ra, sp, gp, a1-a7. */
-    LREG    ra,  (1 * REGBYTES)(a0)
-    LREG    sp,  (2 * REGBYTES)(a0)
-    LREG    gp,  (3 * REGBYTES)(a0)
-    LREG    a1, (11 * REGBYTES)(a0)
-    LREG    a2, (12 * REGBYTES)(a0)
-    LREG    a3, (13 * REGBYTES)(a0)
-    LREG    a4, (14 * REGBYTES)(a0)
-    LREG    a5, (15 * REGBYTES)(a0)
-    LREG    a6, (16 * REGBYTES)(a0)
-    LREG    a7, (17 * REGBYTES)(a0)
-    /* Load a0. */
-    LREG    a0, (10 * REGBYTES)(a0)
+    LREG    ra,  (1 * REGBYTES)(tp)
+    LREG    sp,  (2 * REGBYTES)(tp)
+    LREG    gp,  (3 * REGBYTES)(tp)
+    LREG    a0, (10 * REGBYTES)(tp)
+    LREG    a1, (11 * REGBYTES)(tp)
+    LREG    a2, (12 * REGBYTES)(tp)
+    LREG    a3, (13 * REGBYTES)(tp)
+    LREG    a4, (14 * REGBYTES)(tp)
+    LREG    a5, (15 * REGBYTES)(tp)
+    LREG    a6, (16 * REGBYTES)(tp)
+    LREG    a7, (17 * REGBYTES)(tp)
+    /* swap user tp  partition pointer */
+    csrrw   tp, mscratch, tp
     /* Return to user context. */
     mret

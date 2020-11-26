@@ -31,85 +31,87 @@ typedef struct inbox {
 } inbox_t;
 static inbox_t inboxes[NR_PARTS][NR_PARTS];
 
-static part_t* ksk_yield(part_t* part);
-static part_t* ksk_send(part_t* part);
-static part_t* ksk_recv(part_t* part);
-static part_t* ksk_wait_send(part_t* part);
-static part_t* ksk_wait_recv(part_t* part);
+static void ksk_yield(void);
+static void ksk_send(void);
+static void ksk_recv(void);
+static void ksk_wait_send(void);
+static void ksk_wait_recv(void);
 
-typedef part_t* (*handler_t)(part_t* part);
+typedef void (*handler_t)(void);
 static const handler_t handlers[]
     = { ksk_yield, ksk_send, ksk_recv, ksk_wait_send, ksk_wait_recv };
 
-part_t* handle_syscall(part_t* part, word_t mcause, word_t mtval)
+void handle_syscall(word_t mcause, word_t mtval)
 {
-    word_t syscall_nr = part->regs.a7;
+    word_t syscall_nr = CURRENT.regs.a7;
     if (syscall_nr < ARRAY_SIZE(handlers)) {
-        part->regs.pc += 4;
-        return handlers[syscall_nr](part);
+        word_t pc;
+        CSRR(pc, CSR_MEPC);
+        CSRW(CSR_MEPC, pc + 4);
+        handlers[syscall_nr]();
+    } else {
+        handle_utrap(MCAUSE_EXCPT_USER_ECALL, 0);
     }
-    return handle_uexcpt(part, MCAUSE_EXCPT_USER_ECALL, 0);
 }
 
-part_t* ksk_yield(part_t* part)
+void ksk_yield(void)
 {
-    word_t target = part->regs.a0;
+    word_t target = CURRENT.regs.a0;
     /* If the target partition is invalid, return the
      * current partition. */
     if (target >= NR_PARTS)
-        return handle_uexcpt(part, MCAUSE_EXCPT_USER_ECALL, 0);
+        return handle_utrap(MCAUSE_EXCPT_USER_ECALL, 0);
     /* Return the target partition. */
-    return part;
+    return;
 }
 
-part_t* ksk_send(part_t* part)
+void ksk_send(void)
 {
-    word_t sender = part->id;
-    word_t receiver = part->regs.a0;
+    word_t sender = CURRENT.id;
+    word_t receiver = CURRENT.regs.a0;
     inbox_t* inbox = &inboxes[receiver][sender];
     /* We must check receiver first, otherwise the inbox
      * check is invalid! */
     if (receiver >= NR_PARTS || inbox->full) {
         // maybe do exception for bad receiver??
-        part->regs.a0 = 0;
-        return part;
+        CURRENT.regs.a0 = 0;
+        return;
     }
     /* Copy the message from register to inbox, then mark
      * inbox as full. */
-    word_t* msgs = &(part->regs.a2);
+    word_t* msgs = &(CURRENT.regs.a2);
     inbox->msgs[0] = msgs[0];
     inbox->msgs[1] = msgs[1];
     inbox->msgs[2] = msgs[2];
     inbox->msgs[3] = msgs[3];
     inbox->full = 1;
-    part->regs.a0 = 1;
-    return part;
+    CURRENT.regs.a0 = 1;
+    return;
 }
 
-part_t* ksk_recv(part_t* part)
+void ksk_recv(void)
 {
-    word_t sender = part->regs.a0;
-    word_t receiver = part->id;
+    word_t sender = CURRENT.regs.a0;
+    word_t receiver = CURRENT.id;
     inbox_t* inbox = &inboxes[receiver][sender];
     /* We must check sender first, otherwise the inbox check
      * is invalid! */
     if (sender >= NR_PARTS || !inbox->full) {
         // maybe do exception for bad sender??
-        part->regs.a0 = 0;
-        return part;
+        CURRENT.regs.a0 = 0;
+        return;
     }
     /* Copy the message from inbox to register, then mark
      * inbox as empty. */
-    word_t* msgs = &(part->regs.a2);
+    word_t* msgs = &(CURRENT.regs.a2);
     msgs[0] = inbox->msgs[0];
     msgs[1] = inbox->msgs[1];
     msgs[2] = inbox->msgs[2];
     msgs[3] = inbox->msgs[3];
     inbox->full = 0;
-    part->regs.a0 = 1;
-    return part;
+    CURRENT.regs.a0 = 1;
+    return;
 }
 
-part_t* ksk_wait_send(part_t* part) { return part; }
-
-part_t* ksk_wait_recv(part_t* part) { return part; }
+void ksk_wait_send(void) { }
+void ksk_wait_recv(void) { }

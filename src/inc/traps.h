@@ -25,7 +25,7 @@
 // Handles an exception for the partition, using mcause to
 // determine the exception type. mtval is the auxiliary
 // information for the trap.
-part_t* trap_handler(part_t* part, word_t mcause, word_t mtval);
+void trap_handler(word_t mcause, word_t mtval);
 
 void trap_entry(void) NO_RETURN;
-void trap_exit(part_t* part) NO_RETURN;
+void trap_exit(void) NO_RETURN;

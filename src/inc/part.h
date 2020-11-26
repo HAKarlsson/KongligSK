@@ -29,73 +29,44 @@ typedef unsigned long long uint64_t;
 
 /* General purpose registers */
 typedef struct regs {
-    word_t pc;
-    word_t ra;
-    word_t sp;
-    word_t gp;
-    word_t tp;
-    word_t t0;
-    word_t t1;
-    word_t t2;
-    word_t s0;
-    word_t s1;
-    word_t a0;
-    word_t a1;
-    word_t a2;
-    word_t a3;
-    word_t a4;
-    word_t a5;
-    word_t a6;
-    word_t a7;
-    word_t s2;
-    word_t s3;
-    word_t s4;
-    word_t s5;
-    word_t s6;
-    word_t s7;
-    word_t s8;
-    word_t s9;
-    word_t s10;
-    word_t s11;
-    word_t t3;
-    word_t t4;
-    word_t t5;
-    word_t t6;
+    word_t pc; // Program counter
+    word_t ra, sp; // return address and stack pointer (x1-x2)
+    word_t gp, tp; // global pointer and thread pointer (x3-x4)
+    word_t t0, t1, t2; // temporaries (x5-x7)
+    word_t s0, s1; // saved (x8-x9)
+    word_t a0, a1; // return/arguments registers (x10-x11)
+    word_t a2, a3, a4, a5, a6, a7; // argument regusters (x12-x17)
+    word_t s2, s3, s4, s5, s6, s7, s8, s9, s10, s11; // saved (x18-x27)
+    word_t t3, t4, t5, t6; // temporaries (x28-x31)
 } regs_t;
 
 /* User trap setup and handling registers */
 typedef struct ut_regs {
-    word_t ustatus;
-    word_t uie;
-    word_t utvec;
-    word_t uscratch;
-    word_t uepc;
-    word_t ucause;
-    word_t utval;
-    word_t uip;
+    word_t ustatus, uie, utvec; // trap setup registers
+    word_t uscratch, uepc, ucause, utval, uip; // trap handling registers
 } ut_regs_t;
 
 /* Physical memory protection registers */
 typedef struct pmp {
+    // The layout of PMP configuration registers varies depnding on
+    // architecture. For RV64, we have only pmpcfg0, holding configuration
+    // for all eigth memory regions. In RV32, we have pmpcfg0 and pmpcfg1,
+    // holding the configuration for four memory regins each.
     union {
+        uint64_t cfg; // Independent of arch, always pmp0cfg-pmp7cfg.
 #ifdef RV32
+        // RV32
         struct {
-            word_t cfg0;
-            word_t cfg1;
+            word_t cfg0; // pmp0cfg - pmp3cfg
+            word_t cfg1; // pmp4cfg - pmp7cfg
         };
 #else
-        word_t cfg0
+        // RV64
+        word_t cfg0; // pmp0cfg - pmp7cfg
 #endif
-        uint64_t cfg;
     };
-    word_t addr0;
-    word_t addr1;
-    word_t addr2;
-    word_t addr3;
-    word_t addr4;
-    word_t addr5;
-    word_t addr6;
-    word_t addr7;
+    word_t addr0, addr1, addr2, addr3; // pmpaddr0-pmpaddr3
+    word_t addr4, addr5, addr6, addr7; // pmpaddr4-pmpaddr7
 } pmp_t;
 
 /* Partition control block */
@@ -107,69 +78,74 @@ typedef struct part {
     word_t id;
 } part_t;
 extern part_t parts[NR_PARTS];
+register part_t* curr_part __asm__("x4"); // Maybe mode this to sched?
+#define CURRENT (*curr_part)
 
-#ifdef RV32
-#define SAVEX(n)                                                              \
-    __asm__("sw x" #n ", (" #n " * 4)(%0);" ::"r"(&part->regs) : "memory")
-#else
-#define SAVEX(n)                                                              \
-    __asm__("sd x" #n ", (" #n " * 8)(%0);" ::"r"(&part->regs) : "memory")
-#endif
 // Save registers tp, t0-t6 and s0-s11.
 // Other registers are saved in trap_entry.
 inline void save_regs(part_t* part)
 {
-    SAVEX(4);
-    SAVEX(5);
-    SAVEX(6);
-    SAVEX(7);
-    SAVEX(8);
-    SAVEX(9);
-    SAVEX(18);
-    SAVEX(19);
-    SAVEX(20);
-    SAVEX(21);
-    SAVEX(22);
-    SAVEX(23);
-    SAVEX(24);
-    SAVEX(25);
-    SAVEX(26);
-    SAVEX(27);
-    SAVEX(28);
-    SAVEX(29);
-    SAVEX(30);
-    SAVEX(31);
+    // clang-format off
+    __asm__(
+      SREG " x5,   (5 * %0)(%1);"
+      SREG " x6,   (6 * %0)(%1);"
+      SREG " x7,   (7 * %0)(%1);"
+      SREG " x8,   (8 * %0)(%1);"
+      SREG " x9,   (9 * %0)(%1);"
+      SREG " x18, (18 * %0)(%1);"
+      SREG " x19, (19 * %0)(%1);"
+      SREG " x20, (20 * %0)(%1);"
+      SREG " x21, (21 * %0)(%1);"
+      SREG " x22, (22 * %0)(%1);"
+      SREG " x23, (23 * %0)(%1);"
+      SREG " x24, (24 * %0)(%1);"
+      SREG " x25, (25 * %0)(%1);"
+      SREG " x26, (26 * %0)(%1);"
+      SREG " x27, (27 * %0)(%1);"
+      SREG " x28, (28 * %0)(%1);"
+      SREG " x29, (29 * %0)(%1);"
+      SREG " x30, (30 * %0)(%1);"
+      SREG " x31, (31 * %0)(%1);"
+      "csrr  x5, mscratch;"         // load user tp from mscratch
+      "csrr  x6, mepc;"             // load user pc from mscratch
+      SREG " x5,   (4 * %0)(%1);"   // save user tp to part
+      SREG " x6,   (0 * %0)(%1);"   // save user pc to part
+      :: "i"(REGBYTES), "r"(&part->regs)
+      : "memory");
+    // clang-format on
 }
 
-#ifdef RV32
-#define LOADX(n) __asm__("lw x" #n ", (" #n " * 4)(%0);" ::"r"(&part->regs))
-#else
-#define LOADX(n) __asm__("ld x" #n ", (" #n " * 8)(%0);" ::"r"(&part->regs))
-#endif
 // Load registers tp, t0-t6 and s0-s11.
 // Other registers are loaded in trap_exit.
 inline void load_regs(const part_t* part)
 {
-    LOADX(4);
-    LOADX(5);
-    LOADX(6);
-    LOADX(7);
-    LOADX(8);
-    LOADX(9);
-    LOADX(18);
-    LOADX(19);
-    LOADX(20);
-    LOADX(21);
-    LOADX(22);
-    LOADX(23);
-    LOADX(24);
-    LOADX(25);
-    LOADX(26);
-    LOADX(27);
-    LOADX(28);
-    LOADX(29);
-    LOADX(30);
-    LOADX(31);
+    // clang-format off
+    __asm__(
+      LREG " x5,   (4 * %0)(%1);"   // load user tp from part 
+      LREG " x6,   (0 * %0)(%1);"   // load user pc from part 
+      "csrw  mscratch, x5;"         // save user tp to mscratch
+      "csrw  mepc, x5;"             // save user pc to mepc 
+      LREG " x5,   (5 * %0)(%1);"
+      LREG " x6,   (6 * %0)(%1);"
+      LREG " x7,   (7 * %0)(%1);"
+      LREG " x8,   (8 * %0)(%1);"
+      LREG " x9,   (9 * %0)(%1);"
+      LREG " x18, (18 * %0)(%1);"
+      LREG " x19, (19 * %0)(%1);"
+      LREG " x20, (20 * %0)(%1);"
+      LREG " x21, (21 * %0)(%1);"
+      LREG " x22, (22 * %0)(%1);"
+      LREG " x23, (23 * %0)(%1);"
+      LREG " x24, (24 * %0)(%1);"
+      LREG " x25, (25 * %0)(%1);"
+      LREG " x26, (26 * %0)(%1);"
+      LREG " x27, (27 * %0)(%1);"
+      LREG " x28, (28 * %0)(%1);"
+      LREG " x29, (29 * %0)(%1);"
+      LREG " x30, (30 * %0)(%1);"
+      LREG " x31, (31 * %0)(%1);"
+      :: "i"(REGBYTES), "r"(&part->regs));
+    // clang-format on
 }
 
 inline void set_pmp(const part_t* part)

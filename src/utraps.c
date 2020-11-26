@@ -20,33 +20,17 @@
  */
 #include "utraps.h"
 
-part_t* handle_uexcpt(part_t* part, word_t mcause, word_t mtval)
+void handle_utrap(word_t mcause, word_t mtval)
 {
-    /* Save user pc. */
-    part->ut_regs.uepc = part->regs.pc;
     /* Save trap information. */
-    part->ut_regs.ucause = mcause;
-    part->ut_regs.utval = mtval;
+    CURRENT.ut_regs.ucause = mcause;
+    CURRENT.ut_regs.utval = mtval;
     /* Disable interrupts and set UPIE if UIE */
-    part->ut_regs.ustatus = (part->ut_regs.ustatus & 1) << 4;
+    CURRENT.ut_regs.ustatus = (CURRENT.ut_regs.ustatus & 1) << 4;
     /* User jumps to trap handler. */
-    part->regs.pc = part->ut_regs.utvec & ~3UL;
-    return part;
-}
-
-part_t* handle_uintrp(part_t* part, word_t mcause, word_t mtval)
-{
-    /* Save user pc. */
-    part->ut_regs.uepc = part->regs.pc;
-    /* Save trap information. */
-    part->ut_regs.ucause = mcause;
-    part->ut_regs.utval = mtval;
-    /* Disable interrupts and set UPIE if UIE */
-    part->ut_regs.ustatus = (part->ut_regs.ustatus & 1) << 4;
-    /* User jumps to trap handler. */
-    part->regs.pc = part->ut_regs.utvec & ~3UL;
-    /* Add offset if vectored mode. */
-    if (part->ut_regs.utvec & 1)
-        part->regs.pc += (mcause << 2);
-    return part;
+    CURRENT.ut_regs.uepc = CURRENT.regs.pc;
+    word_t trap_pc = CURRENT.ut_regs.utvec & ~3UL;
+    if (CURRENT.ut_regs.utvec & 1 && (long)mcause < 0)
+        trap_pc += (mcause << 2); // if vectored mode, add offset
+    CSRRW(CURRENT.ut_regs.uepc, CSR_MEPC, trap_pc);
 }
