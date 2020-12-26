@@ -4,9 +4,6 @@
 # Elf files
 *.elf
 
-# configuration header
-src/inc/config.h
-
 # objdump files
 *.da
 
@@ -15,3 +12,6 @@ src/inc/config.h
 
 # dependency files
 *.d
+
+# build dir
+build

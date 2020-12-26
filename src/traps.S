@@ -1,21 +1,6 @@
-/*
- * This file is part of KongligSK.
- * Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
- *
- * KongligSK is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * KongligSK is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with KongligSK.  If not, see <https://www.gnu.org/licenses/>.
- */
-#include "util.h"
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright 2020, Henrik Karlsson
+#include "defs.h"
 
 .extern __global_pointer$
 .extern handle_trap
@@ -26,9 +11,9 @@
 .section .text.traps
 .align 4
 trap_entry:
-    /* swap user tp with partition pointer */
+    // Swap user tp with partition pointer.
     csrrw   tp, mscratch, tp 
-    /* Save ra, sp, gp, a0-a7. */
+    // Save user ra, sp, gp, a0-a7.
     SREG    ra,  (1 * REGBYTES)(tp)
     SREG    sp,  (2 * REGBYTES)(tp)
     SREG    gp,  (3 * REGBYTES)(tp)
@@ -41,21 +26,21 @@ trap_entry:
     SREG    a6, (16 * REGBYTES)(tp)
     SREG    a7, (17 * REGBYTES)(tp)
 
-    /* Load kernel gp, sp. */
+    // Load kernel gp, sp.
 .option push
 .option norelax
     la      gp, __global_pointer$
 .option pop
     la      sp, __stack_pointer$
 
-    csrr    a0, mcause  /* a0 -> mcause */
-    csrr    a1, mtval   /* a1 -> mtval */
 
-    /* trap_handler(mcause, mtval) */
+    // trap_handler(mcause, mtval)
+    csrr    a0, mcause
+    csrr    a1, mtval
     call    trap_handler
 
 trap_exit:
-    /* Load ra, sp, gp, a1-a7. */
+    // Load user ra, sp, gp, a1-a7.
     LREG    ra,  (1 * REGBYTES)(tp)
     LREG    sp,  (2 * REGBYTES)(tp)
     LREG    gp,  (3 * REGBYTES)(tp)
@@ -67,7 +52,7 @@ trap_exit:
     LREG    a5, (15 * REGBYTES)(tp)
     LREG    a6, (16 * REGBYTES)(tp)
     LREG    a7, (17 * REGBYTES)(tp)
-    /* swap user tp  partition pointer */
+    // Swap user tp with partition pointer.
     csrrw   tp, mscratch, tp
-    /* Return to user context. */
+    // Return to user context.
     mret

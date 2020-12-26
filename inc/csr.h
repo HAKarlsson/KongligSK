@@ -1,63 +1,42 @@
-/*
- * This file is part of KongligSK.
- * Copyright (c) 2020 Henrik Karlsson <henrik10@kth.se>.
- *
- * KongligSK is free software: you can redistribute it
- * and/or modify it under the terms of the GNU General
- * Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * KongligSK is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU General Public License
- * for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with KongligSK.  If not, see
- * <https://www.gnu.org/licenses/>.
- */
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright 2020, Henrik Karlsson
 #pragma once
 
 #ifndef __ASSEMBLER__
 /*** CSR functions for C ***/
 /* Base instructions */
-#define CSRRW(rd, csr_num, rs)                                                \
-    __asm__("csrrw %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
+#define CSRRW(rd, csr, rs) \
+    __asm__("csrrw %0, " #csr ", %1" : "=r"(rd) : "r"(rs))
 
-#define CSRRS(rd, csr_num, rs)                                                \
-    __asm__("csrrs %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
+#define CSRRS(rd, csr, rs) \
+    __asm__("csrrs %0, " #csr ", %1" : "=r"(rd) : "r"(rs))
 
-#define CSRRC(rd, csr_num, rs)                                                \
-    __asm__("csrrc %0, %1, %2" : "=r"(rd) : "I"(csr_num), "r"(rs))
+#define CSRRC(rd, csr, rs) \
+    __asm__("csrrc %0, " #csr ", %1" : "=r"(rd) : "r"(rs))
 
-#define CSRRWI(rd, csr_num, imm)                                              \
-    __asm__("csrrwi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
+#define CSRRWI(rd, csr, imm) \
+    __asm__("csrrwi %0, " #csr ", %1" : "=r"(rd) : "I"(imm))
 
-#define CSRRSI(rd, csr_num, imm)                                              \
-    __asm__("csrrsi %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
+#define CSRRSI(rd, csr, imm) \
+    __asm__("csrrsi %0, " #csr ", %1" : "=r"(rd) : "I"(imm))
 
-#define CSRRCI(rd, csr_num, imm)                                              \
-    __asm__("csrrci %0, %1, %2" : "=r"(rd) : "I"(csr_num), "I"(imm))
+#define CSRRCI(rd, csr, imm) \
+    __asm__("csrrci %0, " #csr ", %1" : "=r"(rd) : "I"(imm))
 
 /* Pseudo CSR instructions */
-#define CSRR(rd, csr_num) __asm__("csrrs %0, %1, x0" : "=r"(rd) : "I"(csr_num))
+#define CSRR(rd, csr) __asm__("csrr %0, " #csr "" : "=r"(rd))
 
-#define CSRW(csr_num, rs) __asm__("csrrw x0, %0, %1" ::"I"(csr_num), "r"(rs))
+#define CSRW(csr, rs) __asm__("csrw " #csr ", %0" ::"r"(rs))
 
-#define CSRS(csr_num, rs) __asm__("csrrs x0, %0, %1" ::"I"(csr_num), "r"(rs))
+#define CSRS(csr, rs) __asm__("csrs " #csr ", %0" ::"r"(rs))
 
-#define CSRC(csr_num, rs) __asm__("csrrs x0, %0, %1" ::"I"(csr_num), "r"(rs))
+#define CSRC(csr, rs) __asm__("csrc " #csr ", %0" ::"r"(rs))
 
-#define CSRWI(csr_num, imm)                                                   \
-    __asm__("csrrwi x0, %0, %1" ::"I"(csr_num), "I"(imm))
+#define CSRWI(csr, imm) __asm__("csrwi " #csr ", %0" ::"I"(imm))
 
-#define CSRSI(csr_num, imm)                                                   \
-    __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
+#define CSRSI(csr, imm) __asm__("csrsi " #csr ", %0" ::"I"(imm))
 
-#define CSRCI(csr_num, imm)                                                   \
-    __asm__("csrrsi x0, %0, %1" ::"I"(csr_num), "I"(imm))
+#define CSRCI(csr, imm) __asm__("csrci " #csr ", %0" ::"I"(imm))
 
 #endif /* __ASSEMBLER__ */
 
