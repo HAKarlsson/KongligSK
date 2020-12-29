@@ -9,6 +9,7 @@ OBJDUMP	= $(PREFIX)objdump
 SIZE	= $(PREFIX)size
 
 CLOC    = cloc
+FORMAT	= clang-format
 
 # Build directory
 BUILD  ?= build
@@ -27,7 +28,7 @@ DAS  = $(patsubst $(BUILD)/%, $(BUILD)/%.da, $(OBJS) $(ELF))
 
 include flags.mk
 
-.PHONY: all clean size
+.PHONY: all clean size cloc format
 .PRECIOUS: $(OBJS)
 
 all: $(ELF) $(DAS)
@@ -40,6 +41,9 @@ size:
 
 cloc:
 	$(CLOC) $(HDRS) $(SRCS)
+
+format:
+	$(FORMAT) -i src/*.c inc/*.h
 
 $(BUILD):
 	mkdir -p $@
