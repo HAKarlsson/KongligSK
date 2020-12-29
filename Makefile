@@ -8,6 +8,8 @@ LD	= $(PREFIX)ld
 OBJDUMP	= $(PREFIX)objdump
 SIZE	= $(PREFIX)size
 
+CLOC    = cloc
+
 # Build directory
 BUILD  ?= build
 SRC_DIR	= src
@@ -18,20 +20,26 @@ SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*.S)
 HDRS = $(wildcard $(HDR_DIR)/*.h)
 OBJS = $(patsubst $(SRC_DIR)/%, $(BUILD)/%.o, $(SRCS))
 DEPS = $(patsubst $(SRC_DIR)/%, $(BUILD)/%.d, $(SRCS))
-LDS  = konglig.lds
+LDS  = memory.lds konglig.lds
 ELF  = $(BUILD)/konglig.elf
 DAS  = $(patsubst $(BUILD)/%, $(BUILD)/%.da, $(OBJS) $(ELF))
 
 
 include flags.mk
 
-.PHONY: all clean
+.PHONY: all clean size
 .PRECIOUS: $(OBJS)
 
 all: $(ELF) $(DAS)
 
 clean:
 	rm -f $(OBJS) $(ELF) $(DAS) $(DEPS)
+
+size:
+	$(SIZE) $(OBJS) $(ELF)
+
+cloc:
+	$(CLOC) $(HDRS) $(SRCS)
 
 $(BUILD):
 	mkdir -p $@

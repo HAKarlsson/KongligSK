@@ -2,11 +2,12 @@
 // Copyright 2020, Henrik Karlsson
 #include "defs.h"
 
-.extern __global_pointer$
-.extern handle_trap
-
 .global trap_entry
 .global trap_exit
+
+.extern __global_pointer$
+.extern __stack_pointer$
+.extern trap_handler
 
 .section .text.traps
 .align 4
@@ -14,17 +15,17 @@ trap_entry:
     // Swap user tp with partition pointer.
     csrrw   tp, mscratch, tp 
     // Save user ra, sp, gp, a0-a7.
-    SREG    ra,  (1 * REGBYTES)(tp)
-    SREG    sp,  (2 * REGBYTES)(tp)
-    SREG    gp,  (3 * REGBYTES)(tp)
-    SREG    a0, (10 * REGBYTES)(tp)
-    SREG    a1, (11 * REGBYTES)(tp)
-    SREG    a2, (12 * REGBYTES)(tp)
-    SREG    a3, (13 * REGBYTES)(tp)
-    SREG    a4, (14 * REGBYTES)(tp)
-    SREG    a5, (15 * REGBYTES)(tp)
-    SREG    a6, (16 * REGBYTES)(tp)
-    SREG    a7, (17 * REGBYTES)(tp)
+    sd	    ra,  (1 * REGBYTES)(tp)
+    sd      sp,  (2 * REGBYTES)(tp)
+    sd      gp,  (3 * REGBYTES)(tp)
+    sd      a0, (10 * REGBYTES)(tp)
+    sd      a1, (11 * REGBYTES)(tp)
+    sd      a2, (12 * REGBYTES)(tp)
+    sd      a3, (13 * REGBYTES)(tp)
+    sd      a4, (14 * REGBYTES)(tp)
+    sd      a5, (15 * REGBYTES)(tp)
+    sd      a6, (16 * REGBYTES)(tp)
+    sd      a7, (17 * REGBYTES)(tp)
 
     // Load kernel gp, sp.
 .option push
@@ -41,17 +42,17 @@ trap_entry:
 
 trap_exit:
     // Load user ra, sp, gp, a1-a7.
-    LREG    ra,  (1 * REGBYTES)(tp)
-    LREG    sp,  (2 * REGBYTES)(tp)
-    LREG    gp,  (3 * REGBYTES)(tp)
-    LREG    a0, (10 * REGBYTES)(tp)
-    LREG    a1, (11 * REGBYTES)(tp)
-    LREG    a2, (12 * REGBYTES)(tp)
-    LREG    a3, (13 * REGBYTES)(tp)
-    LREG    a4, (14 * REGBYTES)(tp)
-    LREG    a5, (15 * REGBYTES)(tp)
-    LREG    a6, (16 * REGBYTES)(tp)
-    LREG    a7, (17 * REGBYTES)(tp)
+    ld	    ra,  (1 * REGBYTES)(tp)
+    ld      sp,  (2 * REGBYTES)(tp)
+    ld      gp,  (3 * REGBYTES)(tp)
+    ld      a0, (10 * REGBYTES)(tp)
+    ld      a1, (11 * REGBYTES)(tp)
+    ld      a2, (12 * REGBYTES)(tp)
+    ld      a3, (13 * REGBYTES)(tp)
+    ld      a4, (14 * REGBYTES)(tp)
+    ld      a5, (15 * REGBYTES)(tp)
+    ld      a6, (16 * REGBYTES)(tp)
+    ld      a7, (17 * REGBYTES)(tp)
     // Swap user tp with partition pointer.
     csrrw   tp, mscratch, tp
     // Return to user context.

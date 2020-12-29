@@ -7,5 +7,7 @@
 
 void init_kernel(void) {
     current = &parts[0];
+    set_pmp(current);
+    load_regs(current);
     trap_exit();
 }

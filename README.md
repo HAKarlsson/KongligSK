@@ -27,17 +27,21 @@ TBD.
 ## Guide
 KongligSK requires
 - `make` - for building the system (required) 
-- `python3` - for making configuration file (required)
-- `riscv64-unknown-elf-gcc` - compiling source files (required)
-- `riscv64-unknown-elf-ld` - linking object files (required)
-- `riscv64-unknown-elf-objdump` - examine binary files (recommended)
-- `riscv64-unknown-elf-size` - examine binary size (optional) 
+- `riscv64-[unknown-]elf-gcc` - compiling source files (required)
+- `riscv64-[unknown-]elf-ld` - linking object files (required)
+- `riscv64-[unknown-]elf-objdump` - examine binary files (recommended)
+- `riscv64-[unknown-]elf-size` - examine binary size (optional) 
 - `cloc` - count lines of code (optional)
 - `clang-format` - format source and header files (optional)
 
 ### Ubuntu 20.04 install
 ```
 sudo apt install make python3 gcc-riscv64-unknown-elf cloc clang-format
+```
+
+### Arch Linux Install
+```
+sudo pacman -Syu riscv64-elf-gcc riscv64-elf-binutils base-devel cloc clang
 ```
 
 ### Make targets
