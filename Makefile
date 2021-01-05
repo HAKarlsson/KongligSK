@@ -1,34 +1,38 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright 2020, Henrik Karlsson
+# Copyright 2020-2021, Henrik Karlsson
+
+# Arch (RV64 or RV32)
+ARCH	?= RV64
+# Toolchain prefix
+PREFIX	?= riscv64-elf-
+# Build directory for object, elf and da.
+BUILD	?= build
 
 # Toolchain
-PREFIX ?= riscv64-elf-
 CC	= $(PREFIX)gcc
 LD	= $(PREFIX)ld
+AR	= $(PREFIX)ar
 OBJDUMP	= $(PREFIX)objdump
 SIZE	= $(PREFIX)size
 
-CLOC    = cloc
+CLOC	= cloc
 FORMAT	= clang-format
 
-# Build directory
-BUILD  ?= build
-SRC_DIR	= src
-HDR_DIR = inc
-
 # Files
-SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*.S)
-HDRS = $(wildcard $(HDR_DIR)/*.h)
-OBJS = $(patsubst $(SRC_DIR)/%, $(BUILD)/%.o, $(SRCS))
-DEPS = $(patsubst $(SRC_DIR)/%, $(BUILD)/%.d, $(SRCS))
-LDS  = memory.lds konglig.lds
-ELF  = $(BUILD)/konglig.elf
-DAS  = $(patsubst $(BUILD)/%, $(BUILD)/%.da, $(OBJS) $(ELF))
+SRCS	= $(wildcard kongligsk/*.c) $(wildcard kongligsk/*.S)
+HDRS	= $(wildcard kongligsk/*.h)
+LDS	= kongligsk/kongligsk.lds
+
+# Targets
+OBJS	= $(patsubst %, $(BUILD)/%.o, $(SRCS))
+DEPS	= $(patsubst %, $(BUILD)/%.d, $(SRCS))
+ELF	= $(BUILD)/kongligsk.elf
+DAS	= $(addsuffix .da, $(OBJS) $(ELF))
 
 
-include flags.mk
+include FLAGS.mk
 
-.PHONY: all clean size cloc format
+.PHONY: all clean cloc format size
 .PRECIOUS: $(OBJS)
 
 all: $(ELF) $(DAS)
@@ -36,28 +40,28 @@ all: $(ELF) $(DAS)
 clean:
 	rm -f $(OBJS) $(ELF) $(DAS) $(DEPS)
 
-size:
+size: $(OBJS) $(ELF)
 	$(SIZE) $(OBJS) $(ELF)
 
 cloc:
 	$(CLOC) $(HDRS) $(SRCS)
 
 format:
-	$(FORMAT) -i src/*.c inc/*.h
+	$(FORMAT) -i kongligsk/*.[hc]
 
-$(BUILD):
-	mkdir -p $@
-
-$(BUILD)/%.c.o: $(SRC_DIR)/%.c | $(BUILD)
+$(BUILD)/%.c.o: %.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -MD -c -o $@ $<
 
-$(BUILD)/%.S.o: $(SRC_DIR)/%.S | $(BUILD)
+$(BUILD)/%.S.o: %.S
+	@mkdir -p $(dir $@)
 	$(CC) $(SFLAGS) -MD -c -o $@ $<
 
-$(BUILD)/%.elf: $(OBJS) $(LDS) | $(BUILD)
+$(ELF): $(OBJS) $(LDS)
+	@mkdir -p $(dir $@)
 	$(LD) $(LDFLAGS) $(OBJS) -o $@
 
-$(BUILD)/%.da: $(BUILD)/% | $(BUILD)
+%.da: %
 	$(OBJDUMP) -d $< > $@
 
 

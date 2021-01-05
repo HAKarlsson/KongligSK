@@ -1,13 +1,81 @@
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright 2020, Henrik Karlsson
+// Copyright 2020-2021, Henrik Karlsson
 #pragma once
 
-#define REGBYTES 8
-#define REGBITS 32
+#if __riscv_xlen == 32
+#define RV32
+#define SEL(x, y) x
+#else
+#define RV64
+#define SEL(x, y) y
+#endif
+
+// SEL(x, y) is x for RV32 and y for RV64
+#define REGBYTES SEL(4, 8)
+#define REGBITS SEL(32, 64)
+#define LREG SEL(lw, ld)
+#define SREG SEL(sw, sd)
 
 #define NO_RETURN __attribute__((noreturn))
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+
+// register & pmp offsets
+#define PC 0
+#define RA 1
+#define SP 2
+#define GP 3
+#define TP 4
+#define T0 5
+#define T1 6
+#define T2 7
+#define S0 8
+#define S1 9
+#define A0 10
+#define A1 11
+#define A2 12
+#define A3 13
+#define A4 14
+#define A5 15
+#define A6 16
+#define A7 17
+#define S2 18
+#define S3 19
+#define S4 20
+#define S5 21
+#define S6 22
+#define S7 23
+#define S8 24
+#define S9 25
+#define S10 26
+#define S11 27
+#define T3 28
+#define T4 29
+#define T5 30
+#define T6 31
+
+#ifdef RV32
+#define PMPCFG0 32
+#define PMPCFG1 33
+#define PMPADDR0 34
+#define PMPADDR1 35
+#define PMPADDR2 36
+#define PMPADDR3 37
+#define PMPADDR4 38
+#define PMPADDR5 39
+#define PMPADDR6 40
+#define PMPADDR7 41
+#else /* RV64 */
+#define PMPCFG0 32
+#define PMPADDR0 33
+#define PMPADDR1 34
+#define PMPADDR2 35
+#define PMPADDR3 36
+#define PMPADDR4 37
+#define PMPADDR5 38
+#define PMPADDR6 39
+#define PMPADDR7 40
+#endif
 
 #define INST_ECALL 0x00000073
 #define INST_URET 0x00200073
