@@ -48,7 +48,7 @@ typedef struct part {
 	pmp_t pmp;
 	ut_regs_t ut_regs;
 	uintptr_t id;
-} part_t;
+} part_t __attribute__((aligned(16)));
 
 /*
  * An array of partitions.

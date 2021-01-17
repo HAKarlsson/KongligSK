@@ -3,7 +3,9 @@
 #pragma once
 #include "config.defs.h"
 
+#define SMP
+
 #define PARTITIONS           \
 	PART1(0, NA4(W, 12)) \
 	PART1(0, NA4(W, 12))
-#define NR_PARTS 4
+#define NR_PARTS 2

@@ -3,4 +3,6 @@
 #pragma once
 #include "part.h"
 
-void handle_mtimer(uintptr_t mcause, uintptr_t mtval);
+void sched(void);
+void sched_init(void);
+

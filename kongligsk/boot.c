@@ -3,9 +3,10 @@
 #include "boot.h"
 
 #include "part.h"
+#include "sched.h"
 #include "traps.h"
 
 void init_kernel(void) {
-	current_init(&parts[0]);
-	trap_exit();
+	write_csr(mtval, trap_entry);
+	sched_init();
 }

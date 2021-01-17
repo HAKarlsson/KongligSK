@@ -11,8 +11,6 @@ MEMORY {
 SECTIONS {
 	.text : {
 		KEEP(*(.text.init))
-		KEEP(*(.text.traps))
-		KEEP(*(.text.switch))
 		*(.text) 
 		*(.text.*)
 	}
@@ -32,9 +30,9 @@ SECTIONS {
 		*(.bss.*)
 	}
 	
-	PROVIDE(__stack_size = 0x100);
+	PROVIDE(__stack_size = 128);
 	.stack : {
 		. = ALIGN(16) + __stack_size;
-		PROVIDE(__stack_pointer$ = .);
+		PROVIDE(_sp = .);
 	}
 }

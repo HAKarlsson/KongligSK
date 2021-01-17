@@ -6,9 +6,8 @@
 #include "defs.h"
 #include "sched.h"
 #include "syscall.h"
-#include "utraps.h"
 
-typedef void (*handler_t)(uintptr_t mcause, uintptr_t mtval);
+typedef void (*handler_t)(void);
 
 static const handler_t handlers[] = {
 	// Execeptions
@@ -32,8 +31,39 @@ static const handler_t handlers[] = {
 	[MCAUSE_INTRP_MACHINE_EXTERN | 0x10] = handle_utrap,
 };
 
-void trap_handler(uintptr_t mcause, uintptr_t mtval) {
+void trap_handler(void) {
+	uintptr_t mcause = read_csr(mcause);
 	// If mcause is interrupt, this should be 0x10 (16), otherwise 0.
 	uintptr_t intrp_bit = (mcause >> (REGBITS - 1)) << 4;
-	return handlers[mcause | intrp_bit](mcause, mtval);
+	handlers[mcause | intrp_bit]();
+	sched();
+}
+
+void handle_utrap(void) {
+	uintptr_t mcause = read_csr(mcause);
+	uintptr_t mtval = read_csr(mtval);
+	// Save trap information.
+	current->ut_regs.ucause = mcause;
+	current->ut_regs.utval = mtval;
+
+	// Disable interrupts and set UPIE if UIE.
+	current->ut_regs.ustatus = (current->ut_regs.ustatus & 1) << 4;
+
+	// User jumps to trap handler.
+	current->ut_regs.uepc = current->regs.pc;
+
+	// Set the trap pc base address
+	uintptr_t utvec = current->ut_regs.utvec;
+	uintptr_t trap_pc = (utvec & ~0x3);
+
+	// If interrupt and vectored mode, add offset.
+	// mask = 0xFF..F if interrupts are enabled and we have an interrupt else 0x0
+	uintptr_t mask = ((long)mcause >> (REGBITS - 1)) & -(long)(utvec & 1);
+	trap_pc += (mcause << 2) & mask;
+
+	// Save pc to uepc and jump to trap_pc.
+	current->ut_regs.uepc = swap_csr(mepc, trap_pc);
+}
+
+void handle_mtimer(void) {
 }

@@ -3,4 +3,4 @@
 #pragma once
 #include "part.h"
 
-void handle_syscall(uintptr_t mcause, uintptr_t mtval);
+void handle_syscall(void);

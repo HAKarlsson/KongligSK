@@ -9,7 +9,7 @@
  *
  * Simple uses mcause to find the specific interrupt/exception handler.
  */
-void trap_handler(uintptr_t mcause, uintptr_t mtval);
+void trap_handler(void);
 
 /*
  * Entry function for traps.
@@ -20,12 +20,14 @@ void trap_handler(uintptr_t mcause, uintptr_t mtval);
  * trap_handler for the actual handling of the trap. Once the trap handler has
  * finished, goes to trap_exit
  */
-void trap_entry(void) NO_RETURN;
+void trap_entry(void);
 
-/*
- * Exit function for traps.
- *
- * Brings partition `current`'s registers ra, sp, gp, tp, a0-a7  to context
- * (other registers are already in context), then calls mret.
+/**
+ * Delegate a trap to partition.
  */
-void trap_exit(void) NO_RETURN;
+void handle_utrap(void);
+
+/**
+ * Delegate a trap to partition.
+ */
+void handle_mtimer(void);

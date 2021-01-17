@@ -2,6 +2,8 @@
 // Copyright 2020-2021, Henrik Karlsson
 #pragma once
 
+#include "config.h"
+
 #if __riscv_xlen == 32
 #define RV32
 #define SEL(x, y) x
@@ -15,8 +17,6 @@
 #define REGBITS SEL(32, 64)
 #define LREG SEL(lw, ld)
 #define SREG SEL(sw, sd)
-
-#define NO_RETURN __attribute__((noreturn))
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 

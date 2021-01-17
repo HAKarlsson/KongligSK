@@ -4,7 +4,7 @@
 # Arch (RV64 or RV32)
 ARCH	?= RV64
 # Toolchain prefix
-PREFIX	?= riscv64-elf-
+PREFIX	?= /opt/riscv/bin/riscv64-unknown-elf-
 # Build directory for object, elf and da.
 BUILD	?= build
 

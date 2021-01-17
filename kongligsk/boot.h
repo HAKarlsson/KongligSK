@@ -3,4 +3,4 @@
 #pragma once
 #include "defs.h"
 
-void init_kernel(void) NO_RETURN;
+void init_kernel(void);

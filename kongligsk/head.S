@@ -4,7 +4,7 @@
 
 .global _start
 .extern __global_pointer$
-.extern __stack_pointer$
+.extern _sp
 .extern trap_entry
 .extern init_kernel
 
@@ -19,9 +19,11 @@ _start:
 .option norelax 
   la	gp, __global_pointer$
 .option pop
-  la	sp, __stack_pointer$
-
-  la	a0, trap_entry
-  csrw	mtvec, a0
-
-  tail	init_kernel
+  la	sp, _sp
+#ifdef SMP
+  // add offset to stack
+  csrr  x1, mhartid
+  slli 	x1, x1, 7
+  add	sp, sp, x1
+#endif
+  tail  init_kernel
